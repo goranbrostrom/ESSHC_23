@@ -1,0 +1,25 @@
+compare <- function(infdat){
+   srv <- with(infdat, cbind(enter, exit, event))
+   rs <- risksets(srv, members = FALSE)
+   tid <- c(0, rs$risktime)
+   ## haz:
+   haz <- c(0, with(rs, cumsum(n.events/size)))
+   plot(tid, haz, type = "s", main = "Cum. hazards", axes = FALSE, xlab = "Day")
+   axis(1, at = c(0, g(30), g(365)), labels = c(0, 30, 365))
+   axis(2, las = 1)
+   abline(v = g(30), lty = 3, col = "darkgreen")
+   box()
+   n0 <- min(which(tid > g(30)))
+   n <- length(tid)
+   lines(tid[c(n0, n)], haz[c(n0, n)], lty = 2, col = "red")
+   abline(h = 0, v = 0)
+   ## BP:
+   prob <- c(0, with(rs, cumsum(n.events / size[1])))
+   plot(tid, prob, type = "s", main = "CDF", axes = FALSE, xlab = "Day")
+   axis(1, at = c(0, g(30), g(365)), labels = c(0, 30, 365))
+   axis(2, las = 1)
+   abline(v = g(30), lty = 3, col = "darkgreen")
+   box()
+   lines(tid[c(n0, n)], prob[c(n0, n)], lty = 2, col = "red")
+   abline(h = 0, v = 0)
+}

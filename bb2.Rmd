@@ -1,0 +1,233 @@
+---
+title: "Old Scania Data"
+author: "GB & TB"
+date: '`r Sys.time()`'
+output:
+  bookdown::pdf_document2:
+    citation_package: natbib
+    keep_tex: yes
+    number_sections: yes
+    toc: no
+    toc_depth: 2
+  bookdown::html_document2:
+    number_sections: yes
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+  bookdown::word_document2:
+    toc: no
+    toc_depth: 2
+citation_package: natbib
+##classoption: titlepage
+bibliography: ../Lund2205/lund.bib
+titlepage: no
+biblio-style: apalike
+documentclass: article
+fontsize: 11pt
+header-includes:
+- \usepackage[utf8]{inputenc}
+- \usepackage{graphicx}
+- \usepackage{sectsty}
+- \subsectionfont{\normalfont\itshape}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.height = 4)
+library(eha)
+source("R/tbl.R")
+```
+
+# Introduction
+
+An interesting paper is @lygrab98.
+
+# Read data
+
+```{r readdata}
+sca <- read.table("Data/Copy of test_tommy 2.csv", header = TRUE, sep = ";",
+                  fileEncoding = "latin1")
+sca$EventDate = as.Date(sca$EventDate)
+sca$BirthDate = as.Date(sca$BirthDate)
+sca$DeathDate <- as.Date(sca$DeathDate)
+sca$LastDate <- as.Date(sca$LastDate)
+sca$SexID = NULL
+sca$Sex <- factor(sca$Sex)
+sca$wd <- weekdays(sca$BirthDate)
+sca$death_wd <- weekdays(sca$DeathDate)
+sca$year <- as.numeric(format(sca$BirthDate, format = "%Y"))
+n1 <- NROW(sca)
+cat("No. o f rows = ", n1, "\n")
+```
+
+# Calendar time restrictions
+
+```{r timeres}
+options(warn = -1)
+hog <- sca[sca$ParishName == "Hög", ]
+halm <- sca[sca$ParishName == "Halmstad", ]
+kag <- sca[sca$ParishName == "Kågeröd", ]
+kav <- sca[sca$ParishName == "Kävlinge", ]
+sir <- sca[sca$ParishName == "Sireköpinge", ]
+##
+hog = hog[hog$year >= 1685, ]
+halm <- halm[halm$year >= 1710, ]
+kag <- kag[kag$year >= 1728, ]
+kav <- kav[kav$year >= 1685, ]
+sir <- sir[sir$year >=  1710, ]
+##
+sca <- rbind(hog, halm, kag, kav, sir)
+sca$LastEvent <- factor(sca$LastEvent)
+xxx <- with(sca, table(wd, ParishName))
+n2 <- NROW(sca)
+cat("No. of rows left = ", n2, ", removed", n1-n2, "\n")
+tbl(xxx, caption = "Week day by Parish.", rownames = TRUE)
+options(warn = 0)
+```
+
+# Last date
+
+```{r lastdate}
+weq <- with(sca, LastEvent %in% c("Född", "Hushåll In", "Inflytt", "vigd"))
+sca <- sca[!weq, ]
+sca <- sca[sca$Sex != "Unknown", ]
+sca$Sex <- factor(sca$Sex)
+n3 <- NROW(sca)
+cat("No. of rows left = ", n3, ", removed another ", n2-n3, "\n")
+```
+
+# Sex ratio
+
+See Table \@ref(tab:sexrat).
+
+```{r sexrat}
+xx <- with(sca, table(Sex, ParishName))
+rr <- xx[2, ]  /  xx[1, ]
+sex.ratio <- round(rr, 2)
+tbl(sex.ratio, caption = "Sex ratio by Parish", rownames = TRUE)
+```
+
+
+# Survival data and cohort selection
+
+We select a cohort consisting of all born later than 31 December 1709.
+
+```{r surv}
+sca$exit <- as.numeric(with(sca, LastDate - BirthDate))
+sca$enter <- 0
+sca$exit[sca$exit < 0.5] <- 0.25
+sca$event <- !is.na(sca$DeathDate)
+sca <- age.window(sca, c(0, 365))
+## Temporarily change time scale to year:           NOTE!!!!
+##sca$exit <- sca$exit / 365      NOTE: KEEP DAYS AS TIME SCALE!!
+sca$bdate <- toTime(sca$BirthDate)
+## We do not want to cut spells at calendar time limits:
+##sca <- cal.window(sca, c(1710, 1812), surv = c("enter", "exit", "event", "bdate"))
+sca <- sca[sca$year >= 1710, ] # Cohort selection
+sca$Parish <- factor(sca$ParishName)
+n4 <- NROW(sca)
+cat("No. of rows left = ", n4, ", removed another ", n3-n4, "\n")
+```
+
+# Save data
+
+```{r savedata, echo = TRUE}
+sca$priest <- sca$Parish
+levels(sca$priest) <- c("HalmSir", "HogKav", "Kage", "HogKav", "HalmSir")
+saveRDS(sca, file = "Rdata/sca.rds")
+```
+
+# Analysis
+
+See Table \@ref(tab:prelanal) and Figure \@ref(fig:anfig). For crude period statistics, see Figure \@ref(fig:period).
+
+```{r prelanal, results = 'asis'}
+fit <- coxreg(Surv(exit, event) ~ Sex + I(year - 1770) + Parish, data = sca)
+ltx2(fit, caption = "Cox regression, full period.", label = "tab:prelanal")
+```
+
+
+```{r anfig, fig.cap = "Cumulative hazard function at baseline, boys and Halmstad 1770, model based."}
+plot(fit, col = "blue", xlab = "Age (years)")
+```
+
+
+```{r period, fig.cap = "Crude IMR by time period start."}
+cuts <- c(1710, 1725, 1750, 1775, 1800, 1812)
+yy <- with(sca, cbind(enter/365, exit/365, event, toTime(BirthDate))) # NOTE: /365
+xx <- perstat(yy, cuts, age = c(0, 1))
+plot(cuts[-length(cuts)], xx$intensity, type = "b", ylim = c(0, 0.3), xlim = c(1710, 1811),
+     xlab = "Time period", ylab = "IMR", axes = FALSE, col = "blue")
+axis(1, at = cuts)
+axis(2, las = 1)
+box()
+```
+
+# Bourgeois-Pichat and BB
+
+Time scale days and the log-cube transform. See Figure \@ref{fig:bpscale} for a comparison. Not very linear 
+in either case.
+
+```{r bpscale, fig.cap = "Bourgeois-Pichat in red, BB in blue."}
+## sca$exit <- sca$exit * 365 # ALREADY "DAY SCALE"!
+post <- sca
+##post <- age.window(sca, c(29, 365))
+#post$enter <- post$enter - 0.01
+#post$exit = post$exit - post$enter
+g <- function(x) (log(1 + x))^3
+post <- post[post$year >= 1765, ]
+post$exit <- g(post$exit)
+post$enter <- g(post$enter)
+gsurv <- with(post, Surv(enter, exit, event))
+rs <- risksets(gsurv, members = FALSE)
+bp <- cumsum(rs$n.events) / rs$size[1]
+plot(rs$risktimes, bp, type = "l", ylim = c(0, 0.30), ##xlim = c(g(29), g(365)),
+     xlab = "g(Age)", ylab = "", col = "red")
+bb <- cumsum(rs$n.events) / rs$size
+lines(rs$risktimes, bb, col = "blue", lty = 1)
+n <- length(bb)
+lines(rs$risktimes[c(29, n)], bb[c(29, n)], lty = 2, col = "blue")
+lines(rs$risktimes[c(29, n)], bp[c(29, n)], lty = 2, col = "red")
+```
+
+# Conditional analysis
+
+Condition on survival to 28:th day.
+
+```{r cond}
+p2 <- age.window(post, c(g(28), g(365)))
+```
+
+And BP vs. BB.
+
+```{r bpbbcond, fig.cap = "Bourgeois-Pichat in red, BB in blue, conditional."}
+gsurv <- with(p2, Surv(enter, exit, event))
+rs <- risksets(gsurv, members = FALSE)
+bp <- cumsum(rs$n.events) / rs$size[1]
+plot(rs$risktimes, bp, type = "l", ylim = c(0, 0.30),
+     xlab = "g(Age)", ylab = "", col = "red")
+bb <- cumsum(rs$n.events) / rs$size
+lines(rs$risktimes, bb, col = "blue", lty = 1)
+n <- length(bb)
+lines(rs$risktimes[c(1, n)], bb[c(1, n)], lty = 2, col = "blue")
+lines(rs$risktimes[c(1, n)], bp[c(1, n)], lty = 2, col = "red")
+```
+
+## Gompertz 
+
+```{r gompertz, fig.cap = "Gompertz fit."}
+fit.g <- phreg(Surv(exit - enter, event) ~ 1, data = p2, dist = "gompertz", param = "rate")
+fit.c <- coxreg(Surv(exit - enter, event) ~ 1, data = p2)
+check.dist(fit.g, fit.c)
+```
+
+Good fit, see Figure \@ref(fig:gompertz)!
+
+## Weibull 
+
+```{r weibull, fig.cap = "Weibull fit."}
+fit.w <- phreg(Surv(exit - enter, event) ~ 1, data = p2)
+fit.c <- coxreg(Surv(exit - enter, event) ~ 1, data = p2)
+check.dist(fit.w, fit.c)
+```
+
+Bad fit, see Figure \@ref(fig:weibull).

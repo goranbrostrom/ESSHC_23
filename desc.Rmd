@@ -1,0 +1,164 @@
+---
+title: "Old Scania data, summary statistics"
+author: "GB & TB"
+date: '`r Sys.time()`'
+output:
+  bookdown::pdf_document2:
+    citation_package: natbib
+    keep_tex: yes
+    number_sections: yes
+    toc: yes
+    toc_depth: 2
+  bookdown::html_document2:
+    number_sections: yes
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+  bookdown::word_document2:
+    toc: no
+    toc_depth: 2
+citation_package: natbib
+##classoption: titlepage
+bibliography: ../Lund2205/lund.bib
+titlepage: no
+biblio-style: apalike
+documentclass: article
+fontsize: 11pt
+header-includes:
+- \usepackage[utf8]{inputenc}
+- \usepackage{graphicx}
+- \usepackage{sectsty}
+- \subsectionfont{\normalfont\itshape}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.height = 8)
+library(eha)
+source("R/tbl.R")
+sca <- readRDS("Rdata/sca.rds")
+```
+
+# Introduction
+
+Some statistics for Scania data and 
+
+# Cumulative hazards by parish
+
+First the full period, Figure \@ref(fig:totcum).
+
+```{r totcum, fig.cap = "Cumulative hazards by parish, full period."}
+par(mfrow = c(3, 2))
+fit <- coxreg(Surv(enter, exit, event) ~ strata(Sex), data = sca[sca$Parish == "Halmstad",])
+plot(fit, main = "Halmstad", printLegend = "bottomright")
+fit <- coxreg(Surv(enter, exit, event) ~ strata(Sex), data = sca[sca$Parish == "Hög",])
+plot(fit, main = "Hög", printLegend = "bottomright")
+fit <- coxreg(Surv(enter, exit, event) ~ strata(Sex), data = sca[sca$Parish == "Kågeröd",])
+plot(fit, main = "Kågeröd", printLegend = "bottomright")
+fit <- coxreg(Surv(enter, exit, event) ~ strata(Sex), data = sca[sca$Parish == "Kävlinge",])
+plot(fit, main = "Kävlinge", printLegend = "bottomright")
+fit <- coxreg(Surv(enter, exit, event) ~ strata(Sex), data = sca[sca$Parish == "Sireköpinge",])
+plot(fit, main = "Sireköpinge", printLegend = "bottomright")
+fit <- coxreg(Surv(enter, exit, event) ~ strata(Sex), data = sca)
+plot(fit, main = "Alla", printLegend = "bottomright")
+```
+
+## Period 1710--1765
+
+This period is depicted in Figure \@ref(fig:firstcum).
+
+```{r firstcum, fig.cap = "Cumulative hazards by parish, 1710--1765."}
+par(mfrow = c(3, 2))
+sca1 <- sca[sca$year <= 1765, ]
+fit <- coxreg(Surv(enter, exit, event) ~ strata(Sex), data = sca1[sca1$Parish == "Halmstad",])
+plot(fit, main = "Halmstad", printLegend = "bottomright")
+fit <- coxreg(Surv(enter, exit, event) ~ strata(Sex), data = sca1[sca1$Parish == "Hög",])
+plot(fit, main = "Hög", printLegend = "bottomright")
+fit <- coxreg(Surv(enter, exit, event) ~ strata(Sex), data = sca1[sca1$Parish == "Kågeröd",])
+plot(fit, main = "Kågeröd", printLegend = "bottomright")
+fit <- coxreg(Surv(enter, exit, event) ~ strata(Sex), data = sca1[sca1$Parish == "Kävlinge",])
+plot(fit, main = "Kävlinge", printLegend = "bottomright")
+fit <- coxreg(Surv(enter, exit, event) ~ strata(Sex), data = sca1[sca1$Parish == "Sireköpinge",])
+plot(fit, main = "Sireköpinge", printLegend = "bottomright")
+fit <- coxreg(Surv(enter, exit, event) ~ strata(Sex), data = sca1)
+plot(fit, main = "Alla", printLegend = "bottomright")
+```
+
+## Period 1766--1811
+
+This period is depicted in Figure \@ref(fig:lastcum).
+
+
+```{r lastcum, fig.cap = "Cumulative hazards by parish, 1766--1811."}
+par(mfrow = c(3, 2))
+sca2 <- sca[sca$year > 1766, ]
+fit <- coxreg(Surv(enter, exit, event) ~ strata(Sex), data = sca2[sca2$Parish == "Halmstad",])
+plot(fit, main = "Halmstad", printLegend = "bottomright")
+fit <- coxreg(Surv(enter, exit, event) ~ strata(Sex), data = sca2[sca2$Parish == "Hög",])
+plot(fit, main = "Hög", printLegend = "bottomright")
+fit <- coxreg(Surv(enter, exit, event) ~ strata(Sex), data = sca2[sca2$Parish == "Kågeröd",])
+plot(fit, main = "Kågeröd", printLegend = "bottomright")
+fit <- coxreg(Surv(enter, exit, event) ~ strata(Sex), data = sca2[sca2$Parish == "Kävlinge",])
+plot(fit, main = "Kävlinge", printLegend = "bottomright")
+fit <- coxreg(Surv(enter, exit, event) ~ strata(Sex), data = sca2[sca2$Parish == "Sireköpinge",])
+plot(fit, main = "Sireköpinge", printLegend = "bottomright")
+fit <- coxreg(Surv(enter, exit, event) ~ strata(Sex), data = sca2)
+plot(fit, main = "Alla", printLegend = "bottomright")
+par(mfrow = c(1,1))
+```
+
+
+# Percentage deaths in the first month
+
+```{r propd}
+deaths <- sca[sca$event == 1, c("Parish", "exit")]
+x <- round(prop.table(table(deaths$exit > 28)) * 100, 1)
+names(x) = c("1st month", "later")
+tbl(x, caption = "Percentage deaths first month, all parishes.")
+```
+
+# BP and BB
+
+```{r bpbb, fig.cap = "Bourgeois-Pichat (BP) and Cumulative hazards (BB), full period."}
+g <- function(x) {(log(1 + x))^3}
+ginv <- function(x) {exp(x^(1/3)) - 1}
+sca1 <- sca ## Future use!
+sca$exit <- g(sca$exit) # NOTE!!
+sca$enter <- g(sca$enter) # NOTE!!
+sur <- with(sca, Surv(enter, exit, event))
+source("../Lund2205/R/bbbp.R")
+bbbp(sur)
+```
+
+## 1710--1765
+
+```{r bpbb1, fig.cap = "Bourgeois-Pichat (BP) and Cumulative hazards (BB), born 1710--1765."}
+sur <- with(sca[sca$year <= 1765, ], Surv(enter, exit, event))
+bbbp(sur)
+```
+
+## 1766--1811
+
+```{r bpbb2, fig.cap = "Bourgeois-Pichat (BP) and Cumulative hazards (BB), born 1766--1811."}
+sur <- with(sca[sca$year > 1765, ], Surv(enter, exit, event))
+bbbp(sur)
+```
+
+
+# Father's occupation (standard)
+
+See Table \@ref(tab:occ).
+
+```{r occ}
+xx <- with(sca1, table(FatherOccupationStandard, event))
+##tbl(xx, caption = "Father's occupation by survival.", rownames = TRUE)
+yrk2 <- read.table("../Lund2205/yrkenklass2 utf.csv", header = TRUE, sep = ";", fileEncoding = "UTF-8")
+yy <- cbind(rownames(xx), yrk2[, 2])
+indx <- match(sca1$FatherOccupationStandard, yy[, 1])
+sca1$socst <- yy[indx, 2]
+sca1$socst <- as.factor(sca1$socst)
+xy <- with(sca1, table(socst, event))
+
+tbl(xy, caption = "socst by death, full period.", rownames = TRUE)
+saveRDS(sca1, file = "Rdata/sca1.rds")
+```
+

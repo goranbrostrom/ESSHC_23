@@ -1,0 +1,226 @@
+---
+title: "Biometric analysis of infant mortality, Scania 1710--1812"
+author: "Göran Broström and Tommy Bengtsson"
+date: "`r Sys.time()`"
+output: 
+  bookdown::pdf_document2:
+    citation_package: natbib
+    keep_tex: yes
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+  bookdown::html_document2:
+    number_sections: yes
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+  bookdown::word_document2:
+    toc: no
+    toc_depth: 2
+citation_package: natbib
+##classoption: titlepage
+bibliography: bb.bib
+titlepage: no
+biblio-style: apalike
+documentclass: article
+fontsize: 11pt
+header-includes:
+- \usepackage{a4wide}
+- \usepackage[utf8]{inputenc}
+- \usepackage{graphicx}
+- \usepackage{sectsty}
+- \usepackage[figuresonly]{endfloat}
+- \renewcommand{\efloatseparator}{\mbox{}}
+- \subsectionfont{\normalfont\itshape}
+abstract: "A variation of the Bourgeois-Pichat biometric analysis of infant mortality is studied in connection to data from Scania in the very south of Sweden."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.height = 4)
+##requireNamespace("eha")
+suppressWarnings(library(kableExtra))
+library(eha)
+g <- function(x) (log(x+1))^3 * 365 / (log(366))^3
+##ginv <- function(x) 1 - exp(x * ((log(366)^(1/3)) / 365))
+ginv <- function(y) exp((y / 365)^(1/3) * log(366)) - 1
+##g0 <- function(x) g(x) * 365 / g(365)
+dg <- function(x) 3 * (log(1 + x))^2 / (1 + x) * 365 / (log(366))^3
+```
+
+# Introduction
+
+```{r logcube, fig.cap = "The log-cube transform of time in days versus the identity transform (dashed). Note that g(365) = 365.", fig.height = 7}
+x <- seq(0, 365, length = 366)
+plot(x, g(x), type = "l", xlab = "Days", ylab = "g(Days)", 
+     col = "blue", axes = FALSE)
+att <- c(0, 28, 183, 365)
+axis(1, at = att, labels = att)
+axis(2, las = 1, at = g(att), labels = c("0", "g(28)", "g(183)", "365"))
+box()
+lines(c(0, 365), c(0, 365), lty = 2)
+abline(v = c(0, 365), h = c(0, 365))
+abline(v = 28, h = g(28), col = "darkgreen", lty = 3)
+```
+
+Lois Bourgeois-Pichat saw the first year of life not only as the period when mortality is highest, but also the period when improvements should be possible 
+[@bp51a; @bp51b; @bp52]. He argued that infant deaths should be divided into two categories, endogenous and exogenous deaths. Endogenous deaths are, by definition, due to inherited factors, or acquired during gestation or delivery. They typically occur at the initial period of life, though sometimes much later and include congenital debility, prematurity, malformations, and disease in early life. Exogenous infant mortality, which Bourgeois-Pichat regards as accidental, are deaths for which the society must hold itself responsible and to reduce endogenous mortality, medical intervention is essential [@bp52]. Since it is, based on causes of deaths, difficult to distinguish between endogenous and exogenous factors, either because they are inaccurate or difficult to make due to the diseases themself, or the information do not exist, Bourgeois-Pichat offered a solution to the problem.
+
+Bourgeois-Pichat’s biometric model to differentiate between endogenous and exogenous mortality is based on an idea of a universal law governing the
+distribution of deaths in the first year of life [@bp52]. He assumes that all deaths taking place in the last eleven months of the first year are exogenous. He argues that, although there are also some endogenous mortalities during this period, they do not affect the development of mortality much. Supported by examples from mid-twentieth century Western and Southern Europe, the US and Canada, New Zeeland, and other countries, Bourgeois-Pichat argued that the cumulative infant deaths after the first month follows a linear development given a log-cube transformation of age [@bp52]. Mortality in the first month of life is then divided into an endogenous and an exogenous assuming that the same linearity also exists in this period. It leads to the conclusion that exogenous deaths in the first month of life represent 25 percent of the deaths from the second to twelfth months [@bp52].
+
+Applying this method, Bourgeois-Pichat also finds deviations from the linear death pattern after the first month. To take one example, the curve for Sardinia in 1948 bend strongly upward after four months [@bp52, Figure 12]. To take another example, in the case of Quebec 1944--1947, the curve bends down quite strongly after the sixth month [@bp52, Figure 8]. A downward bend is also what has been found using historical Swedish parish data [@tb99, Figure 6b; @tbcl99, Figures 6 and 7; @lyn98, Figures 1 and 2; @jslgt81, Figure 6d], though less pronounced than in Quebec. The curve for Sweden 1910--1946 show, however, no such downward bend [@bp51b, Figure 9; @bp52].
+
+Bourgeois-Pichat's biometric method has also been used to identify problems with data recording [@wea77; @weasr81]. While a high level of endogenous mortality cannot be used as a criterion for high data quality, the opposite holds true. A very low level of endogenous mortality indeed indicates data problems, just like large deviations from the normal sex ratio at birth do. These two criteria are, in fact, often used in historical studies to evaluate data recording (see Bengtsson et al 2004). They become even more precise if they are applied to different social strata, since under-recording of early deaths often have a social gradient, possibly due to the costs involved in a burial [@tb99; @tbcl99].
+
+We suggest a variation of the Bourgeois-Pichat biometric analysis of infant mortality. Instead of assuming that the cumulative mortality in the last eleven months of infancy follows a uniform distribution, given a log-cube transformation of age, we assume an exponential distribution. The difference is that while the denominator is constant in the Bourgeois-Pichat model, equal to the number of births, in our model, the denominator is the current population at risk. This assumption is more satisfactory from a theoretical point of view, since it models the conditional probability of dying. The growth in birth weight also follows this distribution [@bp51a; @bp51b]. In addition, the model ﬁt is slightly better for our model, especially in cases with high level of infant mortality, common in pre-modern societies. The advantage is that not only is our assumption more attractive from a theoretical point of view, and therefore easier to interpret, but also that it is makes it easier to estimate exogenous and endogenous infant mortality with standard survival analysis programs. In addition, we give examples from eighteenth century Sweden, where the curve do not follow the uniform distribution during the last eleven month of infancy, despite high levels of mortality in the first month of life.
+
+# The Bourgeois-Pichat procedure
+
+Central in the procedure suggested by @bp51a is *the log-cube transform*,
+see Equation \@ref(eq:logcube).
+
+\begin{equation} (\#eq:logcube)
+g(t) = C \log^3(t + 1), \; 0 \le t \le 365,
+\end{equation}
+where $t$ is age measured in days and $C$ is a normalizing constant,
+\begin{equation*}
+C = \frac{365}{\log^3(366)}.
+\end{equation*}
+
+The constant $C$ is chosen so that $g(365) = 365$, see Figure \@ref(fig:logcube).
+Note that $C$ is *not* part of the original definition of the log-cube transform,
+but provided here only to make graphical comparisons easier to interpret. 
+It makes no difference otherwise.
+
+Assume that a cohort of infants is followed over time from birth to age one. There are no drop-outs 
+(no right censoring except at age 365 days). The exact age in days at each observed death is noted and transformed by $g$, 
+and due to imperfect time measuring there may be tied death ages. As an illustrative example, 
+we use a data set from northern Sweden, covering the years 1861--1950.
+```{r readdata}
+infant <- readRDS("Rdata/sca1.rds")
+infant$period <- cut(infant$BirthDate, 
+                   breaks = as.Date(c("1709-12-31", "1734-12-31", 
+                                      "1759-12-31","1784-12-31",  "1812-12-12")),
+                   labels = c("1710-1734", "1735-1759", "1760-1784", "1785-1812"))
+infant <- infant[, c("BirthDate", "Sex", "enter", "exit", "event", "period", 
+                "socst", "ICD10")]
+         
+ginfant <- infant
+ginfant$enter <- g(infant$enter)
+ginfant$exit <- g(infant$exit)
+```
+
+# Biometric analysis in practice
+
+The original procedure of Bourgeos-Pichat is compared to the hazard based procedure for some typical
+cases from the real world.
+
+```{r plotfun}
+pf <- function(x){
+   ## x is a dataframe on g scale
+   rs <- with(x, eha::risksets(Surv(enter, exit, event), members = FALSE))
+   oldpar <- par(mfrow = c(1, 2))
+   drawBB(rs, main = "Hazards method")
+   drawBP(rs, main = "B-P method")
+##
+par(oldpar)
+}
+```
+
+
+## Scania 1710--1820.
+
+
+```{r scahigh, fig.cap = "Scania 1710--1800."}
+source("R/drawBB.R")
+source("R/drawBP.R")
+sca1 <- infant
+sca1 <- sca1[sca1$BirthDate < "1801-01-01", ]
+sca1$exit <- g(sca1$exit)
+sca1$enter <- g(sca1$enter)
+rs <- with(sca1, risksets(Surv(enter, exit, event), members = FALSE))
+oldpar <- par(mfrow = c(1, 2))
+drawBB(rs, main = "Hazards method")
+drawBP(rs, main = "B-P method")
+par(oldpar)
+```
+
+Very bad fits in both cases. Let us look at subsets of the data.
+
+### Hazards by season
+
+We define *season* as four three-months periods, *winter = December + January + February*,
+*spring = March + April + May*, and so on.
+
+```{r seasons, fig.cap = "BB by birth season."}
+sca1$month <- as.numeric(format(as.Date(sca1$BirthDate, format = "%Y-%m-%d"), "%m"))
+oldpar <- par(mfrow = c(2, 2))
+sca1$Q <- ""
+sca1$Q[sca1$month %in% c(1, 2, 12)] <- "winter"
+sca1$Q[sca1$month %in% c(3, 4, 05)] <- "spring"
+sca1$Q[sca1$month %in% c(6, 7, 08)] <- "summer"
+sca1$Q[sca1$month %in% c(9, 10, 11)] <- "fall"
+sca1$Q <- as.factor(sca1$Q)
+
+for (when in levels(sca1$Q)){
+   xxx <- with(sca1[sca1$Q %in% when, ], Surv(enter, exit, event))
+   rs <- risksets(xxx, members = FALSE)
+   drawBB(rs, main = when)
+}
+par(oldpar)
+```
+
+### Hazards without high-mortality years
+
+```{r highmort, fig.cap = "Years with not so high IMR."}
+infant$year <- with(infant, format(BirthDate, "%Y"))
+oldpar <- par(mfrow = c(1, 2), cex = 0.7)
+years <- sort(unique(infant$year))
+
+n <- length(years)
+imr <- numeric(n)
+i <- 0
+for (yr in years){
+   i <- i + 1 
+   imr[i] <- with(infant[infant$year == yr, ], sum(event) / (sum(exit - enter) / 365))
+}
+plot(years, imr, type = "b", las = 1, main = "IMR")
+abline(h = 0.6, lty = 2, col = "red")
+
+badyears <- years[imr > 0.6]
+goodinf <- infant[!(infant$year %in% badyears), ]
+goodinf$exit <- g(goodinf$exit)
+goodinf$enter <- g(goodinf$enter)
+rs <-  with(goodinf, risksets(Surv(enter, exit, event), members = FALSE))
+drawBB(rs, main = "IMR less than 60 percent")
+par(oldpar)
+```
+
+Tried a couple of cut points, no important differences.
+
+### Hazards by socst
+
+```{r socst, fig.cap = "Upper and lower classes."}
+infa <- infant
+oldpar <- par(mfrow = c(1, 2))
+infa$exit <- g(infa$exit)
+xxx <- with(infa[infa$socst %in% c("tjänsteman", "präst", "adel"), ], 
+            Surv(enter, exit, event))
+rs <- risksets(xxx, members = FALSE)
+drawBB(rs, main = "Upper")
+###
+xxx <- with(infa[!(infa$socst %in% c("tjänsteman", "präst", "adel")), ], 
+            Surv(enter, exit, event))
+rs <- risksets(xxx, members = FALSE)
+drawBB(rs, main = "Lower")
+par(oldpar)
+```
+
+# Conclusion
+
+If anything, the hazards method never performs worse than the B-P method.
+But the real strength of the hazards method is that it fits naturally into general 
+modern survival analysis with censored and truncated data, and also proportional 
+hazards models with covariates. 
+
+# References

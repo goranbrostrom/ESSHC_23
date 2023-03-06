@@ -1,0 +1,141 @@
+---
+title: "Endogeneous infant mortality"
+author: "Göran Broström"
+date: "January 6, 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+It is convenient to transform data according to the "log-cube transformation"
+
+$$
+g(T) = \log^3(1 + 365 T), \quad 0 \le T \le 1,
+$$
+before fitting survival models, because on that scale, the *BB* model prescribes the *exponential* distribution. Furthermore, we are interested in splitting the first year of life into two periods, the first month and the last eleven. On the new time scale, the cut point is $\log^3(1 + 30)$ =  `r round((log(1 + 30))^3, 1)`.
+
+```{r transform}
+g <- function(t) (log(1 + 365 * t))^3 # the log-cube transform 
+library(skum)
+boys <- obs[obs$birthdate > 1832 & obs$birthdate < 1890 & obs$sex == "male", ]
+boys$event <- boys$sluttyp == 2 # death
+boys <- boys[, c("id", "region", "birthdate", "enter", "exit", "event")]
+boys <- age.window(boys, c(0, 1)) # first year of life
+boys$enter <- g(boys$enter) # transform 'enter'
+boys$exit <- g(boys$exit) # transform 'exit'
+boys1 <- age.window(boys, c(0, g(1/12))) # first month
+boys2 <- age.window(boys, c(g(1/12), g(1))) # last 11 months
+```
+
+## The Bengtsson-Broström model
+
+So let us check the *Bengtsson-Broström* (BB) model on *boys2*, the last eleven months.
+
+```{r checkbb2}
+fitw <- phreg(Surv(enter - g(1/12), exit - g(1/12), event) ~ I(birthdate - 1900) + region, 
+              data = boys2, dist = "weibull")
+fitc <- coxreg(Surv(enter - g(1/12), exit - g(1/12), event) ~ I(birthdate - 1900) + region,
+               data = boys2)
+check.dist(fitc, fitw, col = c("blue", "red"))
+```
+
+An extraordinary excellent fit to the *Weibull* distribution! But the BB model prescribes an exponential distribution, which corresponds to a Weibull with *shape = 1*. So let us look at the parameter estimates.
+
+```{r}
+summary(fitw)
+```
+
+the shape parameter is estimated to `r exp(fitw$coef[4])`, which is as close to one as you can get. A complete success for the *BB* model.
+
+Now let us look at the first month of life:
+
+```{r checkbb1}
+fitw1 <- phreg(Surv(enter, exit, event) ~ I(birthdate - 1900) + region, 
+               data = boys1, dist = "weibull")
+fitc1 <- coxreg(Surv(enter, exit, event) ~ I(birthdate - 1900) + region, 
+                data = boys1)
+check.dist(fitc1, fitw1, col = c("blue", "red"))
+```
+
+Not so convincing, (i) the fit to a Weibull is slightly worse, and (2) the cumulative hazards are not straight lines, implying deviation from the exponential distribution.
+
+## The Bourgeouis-Pichat suggestion about exogeneity
+
+But this is what Bourgeouis-Pichat is predicting: During months 2--12 mortality is strictly exogeneous, and we can expect a uniform (BB: exponential) distribution, while during the first month there are both exogeneous and endogeneous causes of death, and deviation from the exponential distribution is to be expected.
+
+The estimated coefficients are
+
+```{r resend}
+summary(fitw1)
+```
+
+an we can see that the *shape* parameter is significantly different from one.
+
+One way, the PB way(?), to estimate the contribution of the endogeneous deaths is to assume that the exogeneous mortality is exponential during all twelve months, and extrapolate.
+
+```{r extrapo, fig.cap = "Skellefteå and Umeå boys, 1820-1950."}
+fitex <- phreg(Surv(enter, exit, event) ~ I(birthdate - 1900) + region, 
+               data = boys2, dist = "weibull")
+fitee <- coxreg(Surv(enter, exit, event) ~ I(birthdate - 1900) + region, 
+                data = boys1)
+plot(fitex, xlim = c(0, g(1/12)), col = "blue", fn = "cum", 
+     ylim = c(0, 0.03), main = "Neonatal mortality")
+y <- c(0, cumsum(fitee$hazards[[1]][, 2]))
+x <- c(0, fitee$hazards[[1]][, 1])
+lines(x, y, col = "red")
+abline(h = 0)
+text(10, 0.020, "Total mortality", col = "red")
+text(25, 0.012, "Exogeneous mortality", col = "blue")
+```
+
+Obviously the endogeneous mortality dominates the first month of life. (We are still in the transformed time scale, with "40" representing 1 month.)
+
+## Without the transformation
+
+We repeat everything, but without transforming.
+
+```{r transform2}
+g <- function(t) t # the identity transform! 
+library(skum)
+boys <- obs[obs$birthdate > 1820 & obs$sex == "male", ]
+boys$event <- boys$sluttyp == 2 # death
+boys <- boys[, c("id", "region", "birthdate", "enter", "exit", "event")]
+boys <- age.window(boys, c(0, 1)) # first year of life
+boys$enter <- g(boys$enter) # transform 'enter'
+boys$exit <- g(boys$exit) # transform 'exit'
+boys1 <- age.window(boys, c(0, g(1/12))) # first month
+boys2 <- age.window(boys, c(g(1/12), g(1))) # last 11 months
+```
+
+### The Bengtsson-Broström model, II
+
+So let us check the *Bengtsson-Broström* (BB) model on *boys2*, the last eleven months.
+
+```{r checkbb22}
+fitw <- phreg(Surv(enter - g(1/12), exit - g(1/12), event) ~ I(birthdate - 1900) + region, 
+              data = boys2, dist = "weibull")
+fitc <- coxreg(Surv(enter - g(1/12), exit - g(1/12), event) ~ I(birthdate - 1900) + region,
+               data = boys2)
+check.dist(fitc, fitw, col = c("blue", "red"))
+```
+
+Not an equally excellent fit to the *Weibull* distribution! 
+
+And, add (12 jan 2020) an experiment with the Gompertz distribution:
+
+```{r gomp}
+fitg <- phreg(Surv(enter - g(1/12), exit - g(1/12), event) ~ I(birthdate - 1900) + region, 
+              data = boys2, dist = "gompertz", param = "rate")
+check.dist(fitc, fitg, col = c("blue", "red"), main = "Gompertz")
+```
+
+
+## Conclusion
+
+Maybe it is too early to completely reject the log-cube transformation (and the BB model) for infant mortality.

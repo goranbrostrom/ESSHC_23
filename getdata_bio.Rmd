@@ -1,0 +1,158 @@
+---
+title: "Create survival data frame for BP"
+author: "Göran Broström"
+date: "`r Sys.Date()`"
+output:
+  bookdown::pdf_document2:
+    citation_package: natbib
+    keep_tex: yes
+    number_sections: yes
+    toc: yes
+    toc_depth: 2
+  bookdown::html_document2:
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+  bookdown::word_document2:
+    toc: no
+    toc_depth: 2
+citation_package: natbib
+##classoption: titlepage
+#bibliography: snus2.bib
+titlepage: no
+biblio-style: apalike
+documentclass: article
+fontsize: 11pt
+header-includes:
+- \usepackage[utf8]{inputenc}
+- \usepackage{graphicx}
+- \usepackage{sectsty}
+- \usepackage{endfloat}
+- \renewcommand{\efloatseparator}{\mbox{}}
+- \subsectionfont{\normalfont\itshape}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+requireNamespace("eha")
+```
+
+# Introduction
+
+We are reading data from *Uttag U22003* from Cedar, containing infant mortality 
+data from Västerbotten. The original is stored in *RDS* format in the folder *Data*, 
+two files *individ* and *boende*.
+
+The goal is th create one file suitable for *survival analysis*, meaning that the
+building blocks for *episodes* are there in the form of three variables named *enter*
+(start age of episode), *exit* (end age of episode), and *event* (indicator of death).
+Key covariates are further *birthdate* and *place of birth*.
+
+*Revision December 5, 2022:* Only infants with known birthdate to start with. Infants with incomplete death date are includeed as survivors, provided that it can be established that the 
+infant survived one year of age.
+
+# The individual file
+
+Let's call it *infant*. 
+
+
+*NOTE:* Skip this and concentrate on *boende* for intervals.
+
+We first separate the data into *survivors* **(is.na(deathdate))** and
+*deaths* **(!is.na(deathdate))**, ad then we deal with the two groups separately.
+
+Finally, we merge the two sets.
+
+*END skip*
+
+```{r read, individ}
+ind <- readRDS("../Bio/Data/individ.rds")
+infant <- data.frame(region = ind$REGPREFIX, 
+                     fodfrs = ind$FODHEMFRS,
+                     id = ind$UTTAGSID, 
+                     sex = ind$KON, 
+                     birthdate = ind$FODDAT_U, 
+                     bdupd = ind$FODDAT_IND, 
+                     bapdate = ind$DOPDAT_U, 
+                     bapupd = ind$DOPDAT_IND, 
+                     ab = ind$AB,
+                     fb = ind$FB,
+                     deathdate = ind$DODDAT_U, 
+                     ddupd = ind$DODDAT_IND, 
+                     cause1 = substr(ind$ICD10H_1, 1, 1), ## NOTE: Added 2023-02-09
+                     cause2 = substr(ind$ICD10H_2, 1, 1), ## NOTE: Added 2023-02-09
+                     cause3 = substr(ind$ICD10H_3, 1, 1), ## NOTE: Added 2023-02-09
+                     cause4 = substr(ind$ICD10H_4, 1, 1), ## NOTE: Added 2023-02-09
+                     cause5 = substr(ind$ICD10H_5, 1, 1), ## NOTE: Added 2023-02-09
+                     cause6 = substr(ind$ICD10H_6, 1, 1), ## NOTE: Added 2022-02-09
+                     outdate = ind$BOSDAT_U,
+                     odupd = ind$BOSDAT_IND,
+                     uttyp = ind$BOSTYP, 
+                     parish = ind$FODHEMFRS,
+                     m_parish = ind$MORBOORTKOD, 
+                     hisco = ind$FAR_HISCOKOD_1, 
+                     cause = ind$DODORSSTD_1,
+                     icd10h = ind$ICD10H_1)
+inf <- infant # Save a copy of the original.
+infant <- infant[infant$bdupd < 0.5, ] # Known birthdate.
+infant <- infant[infant$sex %in% 1:2, ] # Known sex
+infant$sex <- factor(infant$sex, labels = c("boy", "girl"))
+#
+infant$birthdate <- as.Date(as.character(infant$birthdate), 
+                            format = "%Y%m%d")
+infant$bapdate <- as.Date(as.character(infant$bapdate), 
+                            format = "%Y%m%d")
+infant$deathdate <- as.Date(as.character(infant$deathdate), 
+                            format = "%Y%m%d")
+infant$outdate <- as.Date(as.character(infant$outdate), 
+                          format = "%Y%m%d")
+survs <- infant[is.na(infant$deathdate), ]
+deaths <- infant[!is.na(infant$deathdate), ]
+```
+
+
+## Survivors
+
+"Survivors" means here individuals with unknown death date.
+
+We need to find a date *last seen* and the corresponding *exposure time*.
+
+```{r survivors}
+exp.time <- with(survs, as.numeric(outdate - birthdate))
+
+survs$exit <- pmin(exp.time, 365) # Note 'p'!
+survs <- survs[survs$exit > 0.5, ]
+survs$event <- 0
+survs$enter <- 0
+##summary(exp.time)
+```
+
+## Deaths
+
+```{r deaths}
+exp.time <- with(deaths, as.numeric(deathdate - birthdate))
+deaths$exit <- exp.time
+deaths <- deaths[deaths$exit >= -0.0001, ] # Safety?!.....
+deaths$exit[deaths$exit <= 0.01] <- 0.25 # Dies on birth day: Six hours of life...
+deaths <- deaths[(deaths$ddupd < 0.5) | (deaths$exit > 365), ]
+deaths$event <- 1
+deaths$enter <- 0
+deaths <- eha::age.window(deaths, c(0, 365))
+```
+
+## Put together and save
+
+```{r together}
+infant <- rbind(deaths, survs)
+infant <- infant[order(infant$birthdate), ]
+infant$icd.chapter <- substr(infant$icd10h, 1, 1)
+is.na(infant$icd.chapter) <- infant$icd.chapter == ""
+infant$icd.chapter <- factor(infant$icd.chapter)
+infant <- infant[infant$birthdate > "1860-12-31", ]
+infant <- infant[infant$birthdate < "1951-01-01", ]
+infant$socst <- (infant$hisco %/% 10000) %in% 1:4
+infant$socst <- factor(infant$socst, labels = c("Other", "Elite"))
+saveRDS(infant, file = "Rdata/infant.rds")
+summary(infant)
+```
