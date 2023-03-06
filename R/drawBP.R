@@ -13,7 +13,7 @@ drawBP <- function(rs, main = "", ylim){
       plot(x, y, type = "l", col = "blue", axes = FALSE, xlab = "Day",
            ylab = "Cum. death fraction", main = main, ylim = ylim)
    }
-   att <- c(0, 28, 183, 274, 365)
+   att <- c(0, 28, 91, 183, 274, 365)
    axis(1, at = g(att), labels = att)
    
    abline(h = 0, v = 0)
