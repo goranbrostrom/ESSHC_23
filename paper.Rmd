@@ -136,8 +136,9 @@ after 28 days (68 on the $g$ scale) is excellent for both time periods.
 Instead of using the total number of births throughout in the denominator as in  the
 Bourgeois-Pichat procedure, we suggest 
 using the present risk-set size, that is, the the total number of infants still alive 
-immediately prior to the death age under investigation. It is easily achieved by the use of 
-the function `risksets` in the package `eha`. See Table \@ref(tab:risksets) for 
+and under observation immediately prior to the death age under investigation. Given 
+proper individual-based data, it is easily achieved. One example is the use of 
+the function `risksets` in the **R** package `eha`. See Table \@ref(tab:risksets) for 
 an illustration.
 ```{r risksets, echo = FALSE, results = 'asis'}
 source("R/tbl.R")
@@ -169,30 +170,7 @@ drawBB(r3, main = "1921-1950", ylim = c(0, 0.115))
 par(oldpar)
 ```
 
-See Figure \@ref(fig:both) for a comparison of the two curves.
-
-```{r both, fig.cap = "Bourgeois-Pichat and 'hazards method' plots."}
-oldpar = par(mfrow = c(1, 2), cex = 0.7, las = 1)
-plot(r1$risktimes, cumsum(r1$n.events) / r1$size[1], type = "l", col = "blue",
-     main = "1861-1890", ylim = c(0, 0.1), xlab = "g(Day)", ylab = "Cum. hazards")
-lines(r1$risktimes, cumsum(r1$n.events / r1$size), type = "l", col = "red")
-abline(h = 0, v = 0)
-text(120, 0.08, "Hazard method", col = "red")
-text(200, 0.02,"Bourgeois-Pichat", col = "blue")
-##
-plot(r3$risktimes, cumsum(r3$n.events) / r3$size[1], type = "l", col = "blue",
-     main = "1921-1950", ylim = c(0, 0.1), xlab = "g(Day)", ylab = "Cum. hazards")
-lines(r3$risktimes, cumsum(r3$n.events / r3$size), type = "l", col = "red")
-abline(h = 0, v = 0)
-text(120, 0.05, "Hazard method", col = "red")
-text(200, 0.015,"Bourgeois-Pichat", col = "blue")
-##
-##
-par(oldpar)
-```
-
-The difference between the two curves increases as infant mortality increases, 
-but both methods show an excellent fit to linearity.
+Both methods show an excellent fit to linearity for this data set.
 
 
 # Theoretical considerations
@@ -210,7 +188,7 @@ Throughout the rest of the paper, everything happens on the $g$ time scale.
 
  We concentrate on the *postneonatal* period, since that is the period where Bourgeois-Pichat claims that the *cumulative distribution function* (CDF) is *Uniform*, and we suggest that the CDF is *exponential*, that is, the *cumulative hazard function* is "uniform" (linear).
 
-In order to see this, the data set from above is *left truncated* at age 28 days (at 68 on the "g" scale), that is, we are considering the *conditional* survival distribution, given survival to age 30.
+In order to see this, the data set from above is *left truncated* at age 28 days (at 68 on the "g" scale), that is, we are considering the *conditional* survival distribution, given survival to age 28 days.
 
 ```{r postneo, fig.cap = "Exponential fits to postneonatal data, Västerbotten."}
 oldpar <- par(mfrow = c(1, 2), cex = 0.7)
@@ -236,61 +214,11 @@ legend("topleft", legend = c("Non-parametric", "Exponential"), lty = 1:2,
 par(oldpar)
 ```
 
-The *Exponential* fit is excellent, with a slight edge for the early period data, 
-where post-neonatal mortality is high. However, one question pops up: If the exponential 
-assumption is in fact true, will it also hold for subgroups of the data?
+The *Exponential* fit is excellent, possibly with a slight edge for the early period, 
+where post-neonatal mortality is high. 
 
-The theoretical ansver is "No", because a mixture of two exponential populations with
-different mortality rates cannot itself be exponential. A heuristic argument for that: Assume two equally-sized 
-groups at "birth", but with different levels of mortality. As time passes, there will be more deaths 
-in the high-mortality group, and that means that the proportion survivors in the low-level group
-will increase. Therefore, the population-level mortality will seem to decrease over time, 
-and not being constant, as the exponentiality prescribes.
-
-We can see what happens when the two periods in Figure \@ref(fig:postneo) are joined, see Figure
-\@ref(fig:joined).
-
-```{r joined, fig.cap = "Exponential fit for two periods, Västerbotten."}
-oldpar = par(cex = 0.7)
-p13 <- post[post$period != "1891-1920", ]
-p13$period <- factor(p13$period)
-fit13 <- coxreg(Surv(exit - enter, event) ~ 1, data = p13)
-wfit13 <- phreg(Surv(exit - enter, event) ~ 1, data = p13, shape = 1)
-plot(fit13, main = "1861-1890 and 1921-1950", xlab = "g(Days)", printLegend = FALSE)
-whaz13 <- hazards(wfit13)
-with(whaz13, lines(x, y, lty = 2, col = "red"))
-legend("topleft", legend = c("Non-parametric", "Exponential"), lty = 1:2, 
-       col = c("blue", "red"), cex = 1)
-#
-par(oldpar)
-```
-
-Not what we expected: The fit seems to be extremely good in both figures! However,
-the rate is close to zero, and so differences are small and hard to notice. And for practical use, they are not interesting.
-
-What about the original Bourgeois-Pichat model, is it sensitive to taking subsets?
-Let us see.
-
-```{r letse, fig.cap = "The period 1861-1890, Bourgeouis-Pichat method by sex."}
-source("R/drawBP.R")
-oldpar <- par(mfrow = c(1,2))
-##
-r1 <- with(post[post$sex == "girl", ], eha::Surv(enter, exit, event))
-r1 <- eha::risksets(r1, members = FALSE)
-drawBP(r1, main = "Girls", ylim = c(0, 0.055))
-##
-##r2 <- with(ginfant[ginfant$period == "1891-1920", ], eha::Surv(enter, exit, event))
-##r2 <- eha::risksets(r2, members = FALSE)
-##drawBP(r2, main = "1891-1920", ylim = c(0, 0.1))
-##
-r3 <- with(post[post$sex == "boy", ], eha::Surv(enter, exit, event))
-r3 <- eha::risksets(r3, members = FALSE)
-drawBP(r3, main = "Boys", ylim = c(0, 0.055))
-par(oldpar)
-```
-
-In Figure \@ref(fig:letse) we notice a weak tendency towards convexity for boys.
-Not a big deal.
+What about the original Bourgeois-Pichat model? See Figure \@ref(fig:first), 
+ages larger than 20 days. Very good fit.
 
 ## Exogeneous mortality 
 
