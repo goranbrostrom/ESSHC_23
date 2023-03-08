@@ -22,9 +22,12 @@ citation_package: natbib
 bibliography: bb.bib
 titlepage: no
 biblio-style: apalike
+setcitestyle: authoryear
 documentclass: article
 fontsize: 11pt
 header-includes:
+- \usepackage{natbib}
+- \setcitestyle{authoryear}
 - \usepackage{a4wide}
 - \usepackage[utf8]{inputenc}
 - \usepackage{graphicx}
@@ -71,7 +74,7 @@ Lois Bourgeois-Pichat saw the first year of life not only as the period when mor
 Bourgeois-Pichat’s biometric model to differentiate between endogenous and exogenous mortality is based on an idea of a universal law governing the
 distribution of deaths in the first year of life [@bp52]. He assumes that all deaths taking place in the last eleven months of the first year are exogenous. He argues that, although there are also some endogenous mortalities during this period, they do not affect the development of mortality much. Supported by examples from mid-twentieth century Western and Southern Europe, the US and Canada, New Zeeland, and other countries, Bourgeois-Pichat argued that the cumulative infant deaths after the first month follows a linear development given a log-cube transformation of age [@bp52]. Mortality in the first month of life is then divided into an endogenous and an exogenous assuming that the same linearity also exists in this period. It leads to the conclusion that exogenous deaths in the first month of life represent 25 percent of the deaths from the second to twelfth months [@bp52].
 
-Applying this method, Bourgeois-Pichat also finds deviations from the linear death pattern after the first month. To take one example, the curve for Sardinia in 1948 bend strongly upward after four months [@bp52, Figure 12]. To take another example, in the case of Quebec 1944--1947, the curve bends down quite strongly after the sixth month [@bp52, Figure 8]. A downward bend is also what has been found using historical Swedish parish data [@tb99, Figure 6b; @tbcl99, Figures 6 and 7; @lyn98, Figures 1 and 2; @jslgt81, Figure 6d], though less pronounced than in Quebec. The curve for Sweden 1910--1946 show, however, no such downward bend [@bp51b, Figure 9; @bp52].
+Applying this method, Bourgeois-Pichat also finds deviations from the linear death pattern after the first month. To take one example, the curve for Sardinia in 1948 bend strongly upward after four months [@bp52, Figure 12]. To take another example, in the case of Quebec 1944--1947, the curve bends down quite strongly after the sixth month [@bp52, Figure 8]. A downward bend is also what has been found using historical Swedish parish data [@tb99, Figure 6b; @tbcl99, Figures 6 and 7; @lyn98, Figures 1 and 2; @jslgt81, Figure 6d], though less pronounced than in Quebec. @knoki77 argues that breastfeeding patterns have a strong impact on the linearity. The curve for Sweden 1910--1946 show, however, no such downward bend [@bp51b, Figure 9; @bp52].
 
 Bourgeois-Pichat's biometric method has also been used to identify problems with data recording [@wea77; @weasr81]. While a high level of endogenous mortality cannot be used as a criterion for high data quality, the opposite holds true. A very low level of endogenous mortality indeed indicates data problems, just like large deviations from the normal sex ratio at birth do. These two criteria are, in fact, often used in historical studies to evaluate data recording (see Bengtsson et al 2004). They become even more precise if they are applied to different social strata, since under-recording of early deaths often have a social gradient, possibly due to the costs involved in a burial [@tb99; @tbcl99].
 
@@ -202,19 +205,35 @@ post <- age.window(ginfant, c(g(28), g(365)))
 p1 <- post[post$period == "1861-1890", ]
 p3 <- post[post$period == "1921-1950", ]
 fit1 <- coxreg(Surv(exit - enter, event) ~ 1, data = p1)
+haz1 <- hazards(fit1)
+x <- c(0, haz1[[1]][, 1])
+y <- c(0, cumsum(haz1[[1]][, 2]))
+##       
 wfit1 <- phreg(Surv(exit - enter, event) ~ 1, data = p1, shape = 1)
 ##check.dist(fit1, wfit1, main = "1861-1890", printLegend = FALSE)
-plot(fit1, main = "1861-1890", printLegend = FALSE, xlab = "g(Day)", col = "blue",
-     ylab = "Cumulative hazards")
+plot(x, y, main = "1861-1890", xlab = "Day", col = "blue",
+     ylab = "Cumulative hazards", axes = FALSE, type = "s")
+axis(2, las = 1)
+axis(1, at = c(0, g(365) - g(28)), labels = c(28, 365))
+abline(h = 0)
+box()
 whaz1 <- hazards(wfit1)
 with(whaz1, lines(x, y, lty = 2, col = "red"))
 legend("topleft", legend = c("Non-parametric", "Exponential"), lty = 1:2, 
        col = c("blue", "red"), cex = 1)
 ##
 fit3 <- coxreg(Surv(exit - enter, event) ~ 1, data = p3)
+haz3 <- hazards(fit3)
+x <- c(0, haz3[[1]][, 1])
+y <- c(0, cumsum(haz3[[1]][, 2]))
 wfit3 <- phreg(Surv(exit - enter, event) ~ 1, data = p3, shape = 1)
 whaz <- hazards(wfit3)
-plot(fit3, main = "1921-1950", printLegend = FALSE, xlab = "g(Day)")
+plot(x, y, main = "1921-1950", xlab = "Day", col = "blue", 
+     ylab = "Cumulativa hazards", axes = FALSE, type = "s")
+axis(2, las = 1)
+axis(1, at = c(0, g(365) - g(28)), labels = c(28, 365))
+box()
+abline(h = 0)
 with(whaz, lines(x, y, lty = 2, col = "red"))
 legend("topleft", legend = c("Non-parametric", "Exponential"), lty = 1:2, 
        col = c("blue", "red"), cex = 1)
@@ -300,7 +319,7 @@ is the estimated hazard function (constant), and the cumulative hazard function 
 2.   On the full infant interval, estimate the total cumulative hazard rate $A(t)$ with the usual 
 Nelson-Aalen estimator $\hat{A}(t)$ [@nelson72; @aalen78]. Then, subtract $H(t)$ from 
 $\hat{A}(t)$ to get $\hat{E}(t)$.
-\begin{equation}
+\begin{equation} (\#eq:endog)
 \hat{E}(t) = \hat{A}(t) - \hat{\lambda} t,\; 0 < t \le g(28).
 \end{equation}
 Note that subtraction and addition of competing risks are okay on the hazards scale, 
@@ -328,8 +347,8 @@ Post-neonatal mortality is the same as exogenous mortality in the sense that the
 hazard functions are the same on the post-neonatal age interval. So the first step
 involves data left truncated at age 28 days. The maximum-likelihood estimator of the rate 
 in the exponential distribution is simply the number of observed post-neonatal deaths
-`r days`, 
-divided by the total post-neonatal exposure time `r expo` (still on the $g$ scale), 
+`r as.integer(days)`, 
+divided by the total post-neonatal exposure time `r format(round(expo), scientific = FALSE)` (still on the $g$ scale), 
 giving a rate of `r rate`.
 
 
@@ -340,34 +359,40 @@ So we are done with the simple post-neonatal period.
 
 ### Step 2: Estimate total and endogenous mortality
 
-Here we focus on neonatal period.
-
-The estimation of the cumulative hazard function for the total neonatal mortality is
+The estimation of the cumulative hazard function for the total neonatal mortality is standard. <!--
 easily achieved by calling the function `hazards` in the *eha* package, see also Figure \@ref(fig:hazards).
-
-```{r hazards, fig.cap = "Cumulative hazard functions for neonatal mortality.", echo = TRUE}
+-->
+```{r hazards, eval = TRUE}
 neo <- age.window(ginfant, c(0, g(28)))
 par(las = 1)
 fit <- coxreg(Surv(enter, exit, event) ~ 1, data = neo)
 hneo <- hazards(fit, cum = TRUE)
 x <- c(0, hneo[[1]][, 1])
 y <- c(0, 1000 * cumsum(hneo[[1]][, 2]))
-plot(x, y, type = "l", xlab = "Day", ylab = "by 1000")
-lines(x, 1000 * rate * x, col = "blue", lty = 2)
-abline(h = 0, v = 0)
-text(8, 15, "Total", col = "black")
-text(8, 5, "Exogenous", col = "blue")
+##plot(x, y, type = "s", xlab = "Day", ylab = "by 1000", axes = FALSE)
+##axis(2, las = 1)
+##axis(1, at = c(g(0), g(7), g(14), g(21), g(28)), labels = c(0, 7, 14, 21, 28))
+##axis(2)
+##box()
+##lines(x, 1000 * rate * x, col = "blue", lty = 2)
+##abline(h = 0, v = 0)
+##text(8, 15, "Total", col = "black")
+##text(8, 5, "Exogenous", col = "blue")
 ```
 
-Next, take the difference between "Total" and "Exogenous" to get "Endogenous", Figure \@ref(fig:enof).
+Next, take the difference between "Total" and "Exogenous", as in Equation \@ref(eq:endog) to get "Endogenous",
+the result is shown in Figure \@ref(fig:enof).
 
-```{r enof, fig.cap = "Cumulative hazard function for endogenous neonatal mortality.", fig.width = 7}
+```{r enof, fig.cap = "Cumulative hazard functions for neonatal mortality, Västerbotten.", fig.width = 7}
 yen <- y - 1000 * rate * x
 par(las = 1)
-plot(x, yen, type = "l", col = "red", xlab = "Day", ylab = "by 1000", ylim = c(0, 36))
+plot(x, yen, type = "s", col = "red", xlab = "Day", ylab = "by 1000", ylim = c(0, 36), axes = FALSE)
+axis(2, las = 1)
+axis(1, at = c(g(0), g(7), g(14), g(21), g(28)), labels = c(0, 7, 14, 21, 28))
+box()
 abline(h = 0, v = 0)
 lines(x, 1000 * rate * g(x), col = "blue", lty = 3)
-lines(x, y, lty = 1)
+lines(x, y, lty = 1, type = "s")
 text(8, 20, "Total", cex = 0.8)
 text(15, 14, "Endogenous", col = "red")
 text(8, 5, "Exogenous", col = "blue", cex = 0.8)
@@ -396,7 +421,14 @@ par(oldpar)
 ```
 
 
-## Västerbotten 1921--1950
+## Västerbotten 
+
+Thee data set from Västerbotten 1861--1950, kept by CEDAR, Umeå University [@u22003], 
+shows almost perfect fits to both the hazards model
+and the original biometric model [@bp51a; @bp51b] in all the three subperiods, see
+the results in the following three subsections.
+
+### The period 1921--1950
 
 ```{r lowume}
 ##source("R/drawBP.R")
@@ -425,7 +457,7 @@ the early days of neonatal mortality, and almost vanishes towards the start of t
 
 The B-P model fit is slightly worse, but not much to bother about.
 
-## Västerbotten 1890--1920
+### The period 1890--1920
 
 ```{r medume}
 source("R/biometric.R")
@@ -451,7 +483,7 @@ pf(ume)
 
 The dominance of endogenous mortality in early life is still clear. The hazards fit is still slightly better.
 
-## Västerbotten 1861--1890
+### The period 1861--1890
 
 ```{r highume}
 source("R/biometric.R")
@@ -461,7 +493,7 @@ crudimr <- with(ume, sum(event) / sum(exit - enter)) * 365
 crudprob <- round((1 - exp(-crudimr)) * 1000)
 ```
 
-The crude IMR in Umeå 1861--1890 was around `r crudprob` per thousand, highest of the three
+The crude IMR in Västerbotten 1861--1890 was around `r crudprob` per thousand, highest of the three
 time periods.
 The biometric analysis is shown in 
 Figure \@ref(fig:bioume6190).
@@ -477,11 +509,18 @@ pf(ume)
 ```
 
 The conclusion here is almost the same as  for the later time periods, good model
-fit and endogenous dominance in the very early days of life. However, the B-P method seems to have a slight upper hand.
+fit and endogenous dominance in the very early days of life. 
+However, the B-P method seems to have a slight upper hand regarding model fit.
 
 
 ## Scania 1710--1800.
 
+This is an interesting case because it appears as if the data quality is low since 
+the linearity during the post-neonatal period is gone. Rather, there is a "hockey-stick" pattern, 
+also seen in other old data sets. See Figure \@ref(fig:scahigh).
+
+However, this data set is known to be of very high quality [@belu99], so we are inclined to 
+think that the biometric model as it is described here simply is inappropriate during the eighteenth century.
 
 ```{r scahigh, fig.cap = "Scania 1710--1800."}
 sca1 <- readRDS("Rdata/sca1.rds")
@@ -496,7 +535,7 @@ drawBP(rs, main = "B-P method")
 par(oldpar)
 ```
 
-Very bad fits in both cases.  <!--- Let us look at the estimated cumulative hazards, total, 
+<!--- Let us look at the estimated cumulative hazards, total, 
 exogenous and endgenous, see Figure \@ref(fig:escu).
 
 ```{r escu, fig.cap = "Scania 1710-1800.", eval = FALSE}
@@ -519,7 +558,7 @@ lines(x, z, col = "red")
 ## Skellefteå 1820--1835
 
 An example of severe under-registration during the neonatal period, see Figure \@ref(fig:skum).
-There is no room for endogeneous deaths at all, but otherwise a reasonably good fit with both 
+There is no room for endogenous deaths at all, but otherwise a reasonably good fit with both 
 methods.
 
 ```{r skum, fig.cap = "Skellefteå 1821--1838."}
