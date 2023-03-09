@@ -52,9 +52,6 @@ dg <- function(x) 3 * (log(1 + x))^2 / (1 + x) * 365 / (log(366))^3
 
 # Introduction
 
-In this version the cumulative hazard functions are depicted as-is, but on the
-log-cube time scale. See the new **R** function *drawBB2*.
-
 ```{r logcube, fig.cap = "The log-cube transform of time in days versus the identity transform (dashed). Note that g(365) = 365.", fig.height = 7}
 x <- seq(0, 365, length = 366)
 plot(x, g(x), type = "l", xlab = "Days", ylab = "g(Days)", 
