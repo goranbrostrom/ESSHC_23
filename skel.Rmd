@@ -1,0 +1,172 @@
+---
+title: "Skellefteå, biometrisk analys"
+author: "Göran Broström"
+date: "2023-03-09"
+output: 
+  bookdown::pdf_document2:
+    citation_package: natbib
+    keep_tex: yes
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+  bookdown::html_document2:
+    number_sections: yes
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+  bookdown::word_document2:
+    toc: no
+    toc_depth: 2
+documentclass: article
+fontsize: 11pt
+header-includes:
+- \usepackage{natbib}
+- \setcitestyle{authoryear}
+- \usepackage{a4wide}
+- \usepackage[utf8]{inputenc}
+- \usepackage{graphicx}
+- \usepackage{sectsty}
+- \usepackage[figuresonly]{endfloat}
+- \renewcommand{\efloatseparator}{\mbox{}}
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.height = 4)
+```
+
+# Spädbarnsdödlighet, Skellefteå undet 1800-talet
+
+```{r datain}
+library(skum)
+births <- obs[obs$starttyp == 2 & obs$region == "ske", ]
+#                 obs$foddat > as.Date("1820-12-31") &
+#                 obs$foddat <= as.Date("1838-12-31"), ]
+births$event <- births$sluttyp == 2
+births$enter <- 365 * births$enter
+births$exit <- 365 * births$exit
+addup <- births$exit <= 0
+births$exit[addup] <- 0.25
+infa <- age.window(births, c(0, 365))
+##infa$enter <- g(infa$enter)
+##infa$exit <- g(infa$exit)
+pf <- function(x){
+   ## x is a dataframe NOT on g scale
+    y <- x
+    y$enter <- g(y$enter)
+    y$exit <- g(y$exit)
+   rs <- with(y, eha::risksets(Surv(enter, exit, event), members = FALSE))
+   oldpar <- par(mfrow = c(1, 2))
+   drawBB2(x, main = "Hazards method")
+   drawBP(rs, main = "B-P method")
+##
+par(oldpar)
+}
+
+g <- function(x) (log(x+1))^3 * 365 / (log(366))^3
+##ginv <- function(x) 1 - exp(x * ((log(366)^(1/3)) / 365))
+ginv <- function(y) exp((y / 365)^(1/3) * log(366)) - 1
+##
+source("R/drawBB2.R")
+source("R/drawBP.R")
+```
+
+## 1800--1950
+
+Perfekt enligt teorin!
+
+```{r alla, fig.cap = "1801-1950."}
+xx <- infa
+pf(xx)
+```
+
+## 1801--1810
+
+Inga endogena dödsfall (att tala om).
+
+```{r ske0, fig.cap = "1801-1810."}
+xx <- infa[infa$foddat > as.Date("1800-12-31") &
+               infa$foddat < as.Date("1811-01-01"), ]
+pf(xx)
+```
+
+## 1811--1820
+
+Usel anpassning.
+
+```{r ske1, fig.cap = "1811-1820."}
+xx <- infa[infa$foddat > as.Date("1810-12-31") &
+               infa$foddat < as.Date("1821-01-01"), ]
+pf(xx)
+```
+
+## 1821--1830
+
+Katastrof! Saknade data pga bokbränder.
+
+```{r ske2, fig.cap = "1821-1830."}
+xx <- infa[infa$foddat > as.Date("1820-12-31") &
+               infa$foddat < as.Date("1831-01-01"), ]
+pf(xx)
+```
+
+## 1831--1840
+
+Hyfsat.
+
+```{r ske3, fig.cap = "1831-1840."}
+xx <- infa[infa$foddat > as.Date("1830-12-31") &
+               infa$foddat < as.Date("1841-01-01"), ]
+pf(xx)
+```
+
+## 1841--1850
+
+Bra.
+
+```{r ske4, fig.cap = "1841-1850."}
+xx <- infa[infa$foddat > as.Date("1840-12-31") &
+               infa$foddat < as.Date("1851-01-01"), ]
+pf(xx)
+```
+
+## 1851--1860
+
+Hyfsat.
+
+```{r ske5, fig.cap = "1851-1860."}
+xx <- infa[infa$foddat > as.Date("1850-12-31") &
+               infa$foddat < as.Date("1861-01-01"), ]
+pf(xx)
+```
+
+## 1861--1870
+
+Hyfsat
+
+```{r ske6, fig.cap = "1861-1870."}
+xx <- infa[infa$foddat > as.Date("1860-12-31") &
+               infa$foddat < as.Date("1871-01-01"), ]
+pf(xx)
+```
+
+## 1871--1900
+
+Utmärkt!
+
+```{r ske7, fig.cap = "1871-1900."}
+xx <- infa[infa$foddat > as.Date("1870-12-31") &
+               infa$foddat < as.Date("1901-01-01"), ]
+pf(xx)
+```
+
+## 1901--1950
+
+Briljant!
+
+```{r ske8, fig.cap = "1901-1950."}
+xx <- infa[infa$foddat > as.Date("1900-12-31") &
+               infa$foddat < as.Date("1951-01-01"), ]
+pf(xx)
+```
+
