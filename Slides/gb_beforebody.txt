@@ -1,0 +1,6 @@
+\setbeamercolor{alerted text}{fg=blue}
+\definecolor{Magenta}{cmyk}{0,1,0,0}
+
+\begin{frame}
+  \titlepage
+\end{frame}

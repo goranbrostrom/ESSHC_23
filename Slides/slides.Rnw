@@ -1,0 +1,120 @@
+\documentclass[t]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+%\usepackage{natbib}
+
+%\usepackage[figuresonly]{endfloat}
+
+%\bibliographystyle{apalike}
+
+\usepackage{color}
+
+\newcommand{\emp}[1]{\textcolor{blue}{#1}}
+
+\usetheme{Singapore}% best choice.
+  \setbeamercovered{transparent}%
+
+\newcommand{\R}{{\bf R}}
+\newcommand{\code}[1]{{\tt #1}}
+
+\title{The biometric analysis of infant mortality and temperature
+  \footnote{ESHD Conference, March 2022, Madrid}
+}
+
+\date{March 3, 2022}
+
+\author{Göran Broström, CEDAR, Umeå University \\
+        Tommy Bengtson, Economic History, Lund University}
+
+
+
+<<setup, include = FALSE>>=
+library(knitr)
+opts_chunk$set(engine='R',dev='pdf',fig.path='figs/slide-',tidy=FALSE,fig.height=5.5,fig.width=8,strip.white=TRUE,cache=TRUE,echo=FALSE,message=FALSE,comment=NA,show.signif.stars = FALSE)##$
+@
+
+<<getgoing>>=
+library(knitr)
+library(eha)
+library(xtable)
+library(skum)
+## Load remote data: NIX!
+@
+
+\begin{document}
+
+\begin{frame}
+
+\maketitle
+
+\end{frame}
+
+\begin{frame}{This is not about ...}
+
+\begin{description}
+  \item[Biometrics] is the measurement and statistical analysis of people's unique physical and behavioral characteristics.
+    \item[Infant mortality]
+\end{description}
+
+\end{frame}
+
+\begin{frame}{What it is about}
+
+  \begin{description}
+\item[Neonatal] mortality (But see Junkka et al (2021)).
+\item[Postneonatal] mortality
+\item[Temperature]
+  \begin{itemize}
+    \item \textcolor{blue}{Climate}
+    \item \textcolor{blue}{Weather}
+\end{itemize}
+  \end{description}
+  \end{frame}
+
+\begin{frame}{Study area}
+
+\includegraphics[width=0.9\textwidth]{myfigs/map2.png}
+
+\end{frame}
+
+\begin{frame}{Infant mortality data}
+
+\emp{All births between January 1, 1895 and December 31, 1950}
+
+\vspace{\baselineskip}
+
+\begin{description}
+ \item[year] Time varying, starting at year of birth.
+ \item[sex]
+ \item[exit] Number of days of follow-up (at most a year).
+   \item[event] Logical, \emph{TRUE} if death is observed.
+     \item[socst] Social status, five categories
+       \item[parity] Birth order.
+       \item[urban] Logical, \emph{TRUE} if born Skellefte{\aa} or
+       Ume{\aa} small town.
+\end{description}
+
+\end{frame}
+
+\begin{frame}{Temperature data}
+
+From Swedish Meteorological and Hydrological Institute (\emp{SMHI}).
+
+<<tempdata>>=
+source("R/tbl.R")
+tum <- read.table("~/Forskning/Data/ume_temp.csv", skip = 10, sep = ";", header = TRUE)
+source("R/tbl.R")
+ww <- tum[70137:(70137 + 20), ]
+names(ww) <- c("Date", "Time", "Temperature", "Quality")
+##tbl(ww, caption = "Raw temperature data from first week of 1923, Umeå.", fs = 10,
+  ##  linesep = c("", "", "\\addlinespace"))
+#print(ww[1:10, ])
+@
+
+\end{frame}
+
+
+\end{document}
+

@@ -1,0 +1,28 @@
+\usepackage[british]{babel}
+\usepackage{xcolor}
+\usepackage{graphicx,hyperref,url}
+%\usepackage{graphicx}
+\usepackage{fontawesome}
+\usepackage{hyperref}
+\usepackage{adjustbox}
+\hypersetup{colorlinks=true,allcolors=blue}
+\usepackage{booktabs}
+\newcommand{\emp}[1]{\textcolor{blue}{#1}}
+\newcommand{\empp}[1]{\textcolor{red}{#1}}
+%\usepackage{columns}
+
+\usetheme{metropolis}
+\title{A hazards approach to the biometric analysis of infant mortality}
+%\subtitle{Northern Sweden 1895--1950}
+\date{\today}
+
+\author{
+  G\"oran Brostr\"om, CEDAR, Ume{\aa} University \\
+  {\small \faEnvelope: \url{gb@ehar.se}} \\
+  {\small \faGithub:  \url{github.com/goranbrostrom}} \\
+  {\small Web : \url{ehar.se}} \and
+  \\ \\
+    Tommy Bengtsson, Centre for Economic Demography, Lund University \\
+    {\small \faEnvelope: \url{tommy.bengtsson@ekh.lu.se} \\
+    {\small Web: \url{ehl.lu.se/kontakt/ekh-tbe}}}
+}
