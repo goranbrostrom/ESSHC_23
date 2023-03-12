@@ -10,3 +10,5 @@ Data
 Rdata
 *.Rproj
 *files
+Slides/*.aux
+Slides/*.toc
