@@ -1,24 +1,14 @@
 ---
+title: A hazards approach to the biometric analysis of infant mortality
+author:
+    - Göran Broström\inst{1}
+    - Tommy Bengtsson\inst{2}
+institute:
+    - \inst{1}CEDAR, Umeå University (gb@ehar.se, https://github.com/goranbrostrom)
+    - \inst{2}CED, Lund University (tommy.bengtsson@ekh.lu.se)
 output:
-   beamer_presentation:
-      includes:
-         before_body: gb_beforebody.txt
-         in_header: gb_header.txt
-      fig_caption: no
-      fig_width: 5
-      keep_tex: true  
-fontsize: 16pt
-author: Göran Broström
-  G\"oran Brostr\"om, CEDAR, Ume{\aa} University \\
-  {\small \faEnvelope: \url{gb@ehar.se}} \\
-  {\small \faGithub:  \url{github.com/goranbrostrom}} \\
-  {\small Web : \url{ehar.se}} \and
-  \\ \\
-    Tommy Bengtsson, Centre for Economic Demography, Lund University \\
-    {\small \faEnvelope: \url{tommy.bengtsson@ekh.lu.se} \\
-    {\small Web: \url{ehl.lu.se/kontakt/ekh-tbe}}}
-
-
+  beamer_presentation:
+    theme: Warsaw
 ---
 
 ```{r setup, include=FALSE}
@@ -43,9 +33,9 @@ par(cex.axis = 1.2)
 *   Bengtsson (1999).
 *   Manfredini (2004).
 
-## Study area
+## Study area 1: Västerbotten 1861--1950
 
-\includegraphics[width=0.9\textwidth]{myfigs/vb.png}
+\includegraphics[width=0.8\textwidth]{myfigs/vb.png}
 
 
 
