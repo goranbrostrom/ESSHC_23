@@ -143,7 +143,7 @@ Bourgeois-Pichat procedure, we suggest
 using the present risk-set size, that is, the the total number of infants still alive 
 immediately prior to the death age under investigation. Given proper data, it is easily achieved.
 For instance,by the use of 
-the function `risksets` in the **R** package `eha` we can get Table \@ref(tab:risksets).
+the function `risksets` in the **R** [@cran] package `eha` [@eha; @ehar2] we can get Table \@ref(tab:risksets).
 
 ```{r risksets, echo = FALSE, results = 'asis'}
 source("R/tbl.R")
@@ -512,7 +512,8 @@ However, the B-P method seems to have a slight upper hand regarding model fit.
 
 ## Scania 1710--1800.
 
-This is an interesting case because it appears as if the data quality is low since 
+The Scanian dataset covers five parishes in Scania 1720--1810 [@sedd].
+It is an interesting case because it appears as if the data quality is low since 
 the linearity during the post-neonatal period is gone. Rather, there is a "hockey-stick" pattern, 
 also seen in other old data sets. See Figure \@ref(fig:scahigh).
 
