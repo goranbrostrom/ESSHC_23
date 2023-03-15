@@ -20,8 +20,8 @@ drawBB2 <- function(dat, main = "", ylim, C = 365 / (log(366))^3){
    y <- cumsum(c(0, xxx[[1]][, 2]))
    
    plot(x, y, type = "s", main = main, xlab = "Day", axes = FALSE, 
-        ylab = "Cumulative hazards")
-   lines(c(0, g(365)), c(0, rate * g(365)), lty = 2, col = "blue")
+        ylab = "Cumulative hazards", lwd = 2)
+   lines(c(0, g(365)), c(0, rate * g(365)), lty = 2, col = "blue", lwd = 2)
    att <- c(0, 28, 91, 183, 274, 365)
    axis(1, at = g(att), labels = att)
    abline(v = g(28), lty = 2, col = "darkgreen", lwd = 1.5)
@@ -32,8 +32,8 @@ drawBB2 <- function(dat, main = "", ylim, C = 365 / (log(366))^3){
    y1 <- y[n]
    red <- y[1:n] - x[1:n] * rate
    redall <- y - x * rate
-   lines(x[1:n], red, col = "red", type = "s", lty = 4)
-   lines(x, redall, col ="magenta", type = "s", lty = 3)
+   lines(x[1:n], red, col = "red", type = "s", lty = 4, lwd = 2)
+   lines(x, redall, col ="magenta", type = "s", lty = 3, lwd = 2)
    y2 <- red[n]
    y3 <- max(y)
    y4 <- rate * g(365)

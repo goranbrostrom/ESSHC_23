@@ -74,6 +74,50 @@ Västerbotten 1801--1950
 \end{column}
 \end{columns}
 
+## Väterbotten 1861-1890
+
+\includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/bioume6190-1.pdf}
+
+## Västerbotten 1921--1950
+
+\includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/bioume9120-1.pdf}
+
+## Comparison 
+
+\includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/both-1.pdf}
+
+## Cumulative hazards, neonatal mortality, Västerbotten 1861-1950
+
+\includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/enof-1.pdf}
+
+## Västerbotten, Bourgeois-Pichat's method
+
+\includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/first-1.pdf}
+
+## Västerbotten, hazards method
+
+\includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/second-1.pdf}
+
+## Västerbotten 1921--1950
+
+\includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/lowumee-1.pdf}
+
+## Exponential fits to post-neonatal data, Västerbotten
+
+\includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/postneo-1.pdf}
+
+
+## Scania 1711--1800
+
+\includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/scahigh-1.pdf}
+
+
+## 
+
+\includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/skum-1.pdf}
+
+
+
 ## Conclusions
 
 *   Good

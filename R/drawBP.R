@@ -8,10 +8,10 @@ drawBP <- function(rs, main = "", ylim){
    y <- c(0, cumsum(rs$n.events) / rs$size[1])
    if (missing(ylim)){
       plot(x, y, type = "l", col = "blue", axes = FALSE, xlab = "Day", 
-           ylab = "Cum. death fraction", main = main)
+           ylab = "Cum. death fraction", main = main, lwd = 2)
    }else{
       plot(x, y, type = "l", col = "blue", axes = FALSE, xlab = "Day",
-           ylab = "Cum. death fraction", main = main, ylim = ylim)
+           ylab = "Cum. death fraction", main = main, ylim = ylim, lwd = 2)
    }
    att <- c(0, 28, 91, 183, 274, 365)
    axis(1, at = g(att), labels = att)
