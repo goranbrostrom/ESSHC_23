@@ -1,4 +1,5 @@
-drawBB2 <- function(dat, main = "", ylim, C = 365 / (log(366))^3){
+drawBB2 <- function(dat, main = "", ylim, C = 365 / (log(366))^3, 
+                    printLegend = TRUE){
     
     ## dat is a "survival data frame with enter, exit (natural scale) and event.
     g <- function(x) {
@@ -45,8 +46,10 @@ drawBB2 <- function(dat, main = "", ylim, C = 365 / (log(366))^3){
    abline(h = c(y3, y4), lty = 3, lwd = 0.5, col = "darkgreen")
    abline(v = 0, lwd = 0.5)
    lines(c(0, g(28)), c(0, 0), lwd = 0.5)
-    legend("bottomright", legend = c("Total", "Exogenous", "Endogenous"),
+   if (printLegend){
+        legend("bottomright", legend = c("Total", "Exogenous", "Endogenous"),
            lty = c(1, 2, 4), col = c("black", "blue", "red"))
+   }
 ###########################################################################   
      if (FALSE){
    n <- rs$size[1]
