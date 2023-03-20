@@ -455,11 +455,34 @@ dat$enter <- 365 * dat$enter # NOTE!
 dat$exit <- 365 * dat$exit # NOTE!
 ```
 
-```{r plotcohort, fig.cap = "By birth month, cohorts.", fig.height = 9, eval = FALSE}
-oldpar <- par(mfrow = c(4, 3))
-for (mon in levels(dat$bmonth)){
-    drawBB2(dat[dat$bmonth == mon, ], main = mon, printLegend = FALSE)
+```{r plotcohort, fig.cap = "By birth month, cohorts.", fig.height = 9, eval = TRUE}
+oldpar <- par(mfrow = c(1, 1))
+dato <- dat[dat$birthdate < as.Date("1950-12-31"), ]
+fit <- coxreg(Surv(g(enter), g(exit), event) ~ strata(bmonth), data = dato)
+cols <- c("blue", "magenta", rep("red", 4), rep("green", 3), "magenta", "blue", "blue")
+haz <- hazards(fit)
+pd <- numeric(12)
+for(i in 1:12){
+    haz[[i]] <- rbind(c(0, 0), haz[[i]])
+    haz[[i]][, 2] <- cumsum(haz[[i]][, 2])
+    pd[i] <- round((1 - exp(-max(haz[[i]][, 2]))) * 100, 1)
 }
+plot(haz[[1]][, 1], haz[[1]][, 2], col = cols[1], axes = FALSE, 
+     type = "l", xlab = "Days", ylab = "Cumulative hazards")
+for (i in 2:12){
+    lines(haz[[i]][, 1], haz[[i]][, 2], col = cols[i], type = "l", lty = i)
+}
+legend("topleft", legend = paste(month.abb, pd, sep = ":  "), lty = 1:12, col = cols)
+att <- c(0, 28, 183, 365)
+axis(1, at = g(att), labels = att)
+axis(2, las = 1)
+box()
+abline(v = g(28), lty = 3)
+abline(h = 0)
+fita <- coxreg(Surv(g(enter), g(exit), event) ~ 1, data = dato)
+haza <- hazards(fita)
+lines(c(0, haza[[1]][, 1]), cumsum(c(0, haza[[1]][, 2])), type = "l", lwd = 2, col = "black")
+legend(100, 0.08, legend = "All", lty = 1, col = "black", lwd = 2)
 par(oldpar)
 ```
 
