@@ -455,7 +455,7 @@ dat$enter <- 365 * dat$enter # NOTE!
 dat$exit <- 365 * dat$exit # NOTE!
 ```
 
-```{r plotcohort, fig.cap = "By birth month, cohorts.", fig.height = 9, eval = TRUE}
+```{r plotcohort, fig.cap = "By birth month, cohorts, Västerbotten 1861-1950.", fig.height = 8, eval = TRUE}
 oldpar <- par(mfrow = c(1, 1))
 dato <- dat[dat$birthdate < as.Date("1950-12-31"), ]
 fit <- coxreg(Surv(g(enter), g(exit), event) ~ strata(bmonth), data = dato)
@@ -486,7 +486,7 @@ legend(100, 0.08, legend = "All", lty = 1, col = "black", lwd = 2)
 par(oldpar)
 ```
 
-```{r plotcohort2, fig.cap = "By birth season, cohorts.", fig.height = 8}
+```{r plotcohort2, fig.cap = "By birth season, cohorts.", fig.height = 8, eval = FALSE}
 oldpar <- par(mfrow = c(2, 2))
 for (seas in levels(dat$bseason)){
     drawBB2(dat[dat$bseason == seas, ], main = seas, printLegend = FALSE)
@@ -495,13 +495,17 @@ par(oldpar)
 ```
 
 We see that the post-neonatal part of the total cumulative hazards are more or
-less convex (bend upward at the end) for those born in spring or summer, while 
-the curves are concave for births in the fall or winter. Bad fits to "constant hazard"
-and "uniform distribution".
+less convex (bend upward at the end) for those born in spring (red) or summer (green), while 
+the curves are concave for births in the winter (blue). Bad fits to "constant hazard"
+and "uniform distribution". However, as the solid black curve shows the 12-month mixture 
+has an excellent fit to a straight line.
+
+Note the two outliers, February and October. Born in February means a tough first month of 
+life, but surviving that, the future prospects are great. The opposite holds for those born in October.
 
 ### Periods by season
 
-```{r plotperiod, fig.cap = "By calendar month, periods.", fig.height = 9, eval = FALSE}
+```{r plotperiod, fig.cap = "By calendar month, period data, Västerbotten 1861-1950.", fig.height = 9, eval = TRUE}
 oldpar <- par(mfrow = c(4, 3))
 for (mon in levels(dat$bmonth)){
     drawBB2(dat[dat$month == mon, ], main = mon, printLegend = FALSE)
@@ -509,7 +513,7 @@ for (mon in levels(dat$bmonth)){
 par(oldpar)
 ```
 
-```{r plotperiod2, fig.cap = "By calendar season, periods.", fig.height = 8}
+```{r plotperiod2, fig.cap = "By calendar season, periods.", fig.height = 8, eval = FALSE}
 oldpar <- par(mfrow = c(2, 2))
 for (seas in levels(dat$season)){
     drawBB2(dat[dat$season == seas, ], main = seas, printLegend = FALSE)
