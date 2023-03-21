@@ -501,7 +501,8 @@ and "uniform distribution". However, as the solid black curve shows the 12-month
 has an excellent fit to a straight line.
 
 Note the two outliers, February and October. Born in February means a tough first month of 
-life, but surviving that, the future prospects are great. The opposite holds for those born in October.
+life, but surviving that, the future prospects are great. The opposite holds for those born in October, 
+no problems during the neonatal phase, but then comes the tough winter months. 
 
 ### Periods by season
 
@@ -521,14 +522,29 @@ for (seas in levels(dat$season)){
 par(oldpar)
 ```
 The periods are of course more homogeneous regarding weather and external threats,
-and it shows off in that in all four periods the suggested models fit well, here shown by the
+and it shows off in that in all months the suggested models fit well, here shown by the
 "constant hazards model" for exogenous mortality.
 
 ### Conclusion
 
 The assumptions about constant hazard and uniform distribution of exogenous mortality 
 are only applicable on population level, it can never hold for an individual. It can 
-be thought of as an average over birth cohorts, where   
+be thought of as an average over birth cohorts, where it is important to have birth dates 
+spread evenly within calendar years.
+
+## Tabular data
+
+Often the Bourheois-Pichat method is applied to tabular data. The most extreme case is
+that the only available data are number of births $B$, number of neonatal deaths $D_1$, and total 
+number of deaths $D$. The Bourgeois-Pichat line fitting is very simple to do in this case, but 
+how about the hazards approach? 
+
+It turns out that it is easy to find given the data at hand followíng the procedure given in 
+Section 4.3: The probability of dying in the post-neonatal period, given survival of the neonatal
+period is estimated by $hat{p} = (D-D_1) / (B - D_1)$, and the length of the post-neonatal time span 
+is $g(365) - g(28) \approx 297$ "g-units". 
+
+
 
 # Biometric analysis in practice
 
