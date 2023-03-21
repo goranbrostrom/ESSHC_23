@@ -414,11 +414,11 @@ seasonal variations in weather, and following that the spread of infectious dise
 To illustrate this, data will be split in two ways, first by "birth month" (cohort data) and second by
 "calendar month" (period data).
 
-### Cohorts by birth season
+### Cohorts by birth month
 
 ```{r datain}
 library(eha)
-Sys.setlocale("LC_ALL", "en_US.utf8")
+nu <- Sys.setlocale("LC_ALL", "en_US.UTF-8")
 g <- function(x) (log(x+1))^3 * 365 / (log(366))^3
 infa <- readRDS("Rdata/infant.rds")[, c("id", "sex", "birthdate", "enter", "exit", "event")]
 infa$exit <- infa$exit / 365 ## NOTE!!
@@ -504,7 +504,7 @@ Note the two outliers, February and October. Born in February means a tough firs
 life, but surviving that, the future prospects are great. The opposite holds for those born in October, 
 no problems during the neonatal phase, but then comes the tough winter months. 
 
-### Periods by season
+### Periods by month
 
 ```{r plotperiod, fig.cap = "By calendar month, period data, Västerbotten 1861-1950.", fig.height = 9, eval = TRUE}
 oldpar <- par(mfrow = c(4, 3))
@@ -534,15 +534,22 @@ spread evenly within calendar years.
 
 ## Tabular data
 
-Often the Bourheois-Pichat method is applied to tabular data. The most extreme case is
+Often the Bourgeois-Pichat method is applied to tabular data. The most extreme case is
 that the only available data are number of births $B$, number of neonatal deaths $D_1$, and total 
 number of deaths $D$. The Bourgeois-Pichat line fitting is very simple to do in this case, but 
 how about the hazards approach? 
 
 It turns out that it is easy to find given the data at hand followíng the procedure given in 
 Section 4.3: The probability of dying in the post-neonatal period, given survival of the neonatal
-period is estimated by $hat{p} = (D-D_1) / (B - D_1)$, and the length of the post-neonatal time span 
-is $g(365) - g(28) \approx 297$ "g-units". 
+period is estimated by $\hat{p} = (D-D_1) / (B - D_1)$, and the length of the post-neonatal time span 
+is $T = g(365) - g(28) \approx 297$ "g-units". The estimate of the rate $\lambda$ in the post-neonatal period
+is then given by
+
+\begin{equation*}
+\hat{\lambda} = -\frac{log(1 - \hat{p})}{T}.
+\end{equation*}
+
+
 
 
 
