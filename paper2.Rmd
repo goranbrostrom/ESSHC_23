@@ -135,7 +135,7 @@ drawBP(r3, main = "1921-1950", ylim = c(0, 0.1))
 par(oldpar)
 ```
 
-The cumulative numbers of death are plotted against the
+The cumulative numbers of deaths, divided by *the number of births*, are plotted against the
 corresponding death ages on the $g$ time scale, and as is seen, the fit to linearity
 after 28 days (68 on the $g$ scale) is excellent for both time periods.
 
@@ -145,8 +145,8 @@ Instead of using the total number of births throughout in the denominator as in 
 Bourgeois-Pichat procedure, we suggest 
 using the present risk-set size, that is, the the total number of infants still alive 
 immediately prior to the death age under investigation. Given proper data, it is easily achieved.
-For instance,by the use of 
-the function `risksets` in the **R** [@cran] package `eha` [@eha; @ehar2] we can get Table \@ref(tab:risksets).
+For instance, by using
+the function `risksets` in the **R** [@cran] package `eha` [@eha; @ehar2] we get Table \@ref(tab:risksets).
 
 ```{r risksets, echo = FALSE, results = 'asis'}
 source("R/tbl.R")
@@ -159,7 +159,7 @@ tbl(lt1[c(1:5, 360:364), ], caption = "Life table for infants in Västerbotten, 
 It starts with `r as.integer(lt1[1, 3])` live births, of which `r lt1[1, 4]` dies on the day of birth, 
 on average at the age of six hours (a quarter of a day), and so on.
 
-The plot corresponding to Figure \@ref(fig:first) is shown in Figure \@ref(fig:second).
+The hazard-based plot corresponding to Figure \@ref(fig:first) is shown in Figure \@ref(fig:second).
 
 ```{r second, fig.cap = "The periods 1861--1890 and 1921--1950 in Västerbotten, hazards method."}
 source("R/drawBB2.R")
@@ -187,17 +187,15 @@ Both methods show an excellent fit to linearity for this data set.
 We note that the Bourgeois-Pichat method requires that no right censorings (infants lost 
 to follow-up before one year of age) are present, and no left truncations (infants under observation 
 only from an age later than birth). The hazards approach, on the other hand, allows
-left truncation and right censoring as long as they are *non-informative* in the usual sense. Often, though,
+left truncation and right censoring. Often, though,
 this not very important, since new-born babies tend to be geographically stationary
 for their first year of life.
 
-Throughout the rest of the paper, everything happens on the $g$ time scale.
-
 ## Post-neonatal mortality
 
- We concentrate on the *postneonatal* period, since that is the period where Bourgeois-Pichat claims that the *cumulative distribution function* (CDF) is *Uniform*, and we suggest that the CDF is *exponential*, that is, the *cumulative hazard function* is "uniform" (linear).
+ We start with the *postneonatal* period, since that is the period where Bourgeois-Pichat claims that the *cumulative distribution function* (CDF) is *Uniform*, and we suggest that the CDF is *exponential*, that is, the *cumulative hazard function* is "uniform" (linear).
 
-In order to see this, the data set from above is *left truncated* at age 28 days (at 68 on the "g" scale), that is, we are considering the *conditional* survival distribution, given survival to age 28.
+In order to investigate this, the data set from above is *left truncated* at age 28 days (at 68 on the "g" scale), that is, we are considering the *conditional* survival distribution, given survival to age 28.
 
 ```{r postneo, fig.cap = "Exponential fits to postneonatal data, Västerbotten."}
 oldpar <- par(mfrow = c(1, 2), cex = 0.7)
@@ -280,7 +278,7 @@ par(oldpar)
 
 We now consider the whole infant age span (on the $g$ scale), and compare the uniform and exponential densities, especially of interest is the fraction of deaths that occur in the neonatal phase. @manfred04 argues that a less satisfactory property of the *B-P* model is that this fraction is constant, 
 18.56 percent, independent of the overall level of infant mortality $p$. This is not the case for the hazards model, see Table \@ref(tab:exog).
-
+As the total mortality increases, the fraction exogenous deaths in the neonatal period also increases.
 ```{r exog}
 source("R/tbl.R")
 p <- c(0.005, 0.01, 0.05, 0.1, 0.2)
@@ -497,7 +495,7 @@ par(oldpar)
 We see that the post-neonatal part of the total cumulative hazards are more or
 less convex (bend upward at the end) for those born in spring (red) or summer (green), while 
 the curves are concave for births in the winter (blue). Bad fits to "constant hazard"
-and "uniform distribution". However, as the solid black curve shows the 12-month mixture 
+and "uniform distribution". However, as the solid black curve shows, the 12-month mixture 
 has an excellent fit to a straight line.
 
 Note the two outliers, February and October. Born in February means a tough first month of 
@@ -528,7 +526,7 @@ and it shows off in that in all months the suggested models fit well, here shown
 ### Conclusion
 
 The assumptions about constant hazard and uniform distribution of exogenous mortality 
-are only applicable on population level, it can never hold for an individual. It can 
+are only applicable on the population level, it can never hold for an individual. It can 
 be thought of as an average over birth cohorts, where it is important to have birth dates 
 spread evenly within calendar years.
 
@@ -620,7 +618,7 @@ crudimr <- with(ume, sum(event) / sum(exit - enter)) * 365
 crudprob <- round((1 - exp(-crudimr)) * 1000)
 ```
 
-The crude IMR in Umeå 1891--1920 was around `r crudprob` per thousand, clearly higher than 
+The crude IMR in Västerbotten 1891--1920 was around `r crudprob` per thousand, clearly higher than 
 the later time period. Let us perform the biometric analysis with these data, see 
 Figure \@ref(fig:bioume9120).
 
@@ -675,6 +673,8 @@ also seen in other old data sets. See Figure \@ref(fig:scahigh).
 
 However, this data set is known to be of very high quality [@tbcl99], so we are inclined to 
 think that the biometric model as it is described here simply is inappropriate during the eighteenth century.
+Specifically, the log-cube transformation, which fits well with 19th century data, seems
+to be completely out of order in the eighteenth century.
 
 ```{r scahigh, fig.cap = "Scania 1710--1800."}
 sca1 <- readRDS("Rdata/sca1.rds")
@@ -713,7 +713,7 @@ lines(x, z, col = "red")
 
 An example of severe under-registration during the neonatal period, see Figure \@ref(fig:skum).
 There is no room for endogenous deaths at all, but otherwise a reasonably good fit with both 
-methods.
+methods in the post-neonatal period..
 
 ```{r skum, fig.cap = "Skellefteå 1821--1838."}
 library(skum)
@@ -737,5 +737,11 @@ If anything, the hazards method never performs worse than the B-P method.
 But the real strength of the hazards method is that it fits naturally into general 
 modern survival analysis with censored and truncated data, and also proportional 
 hazards models with covariates. 
+
+On the other hand, the whole business with the 
+biometric analysis and the log-cube transform seems to be highly questionable. 
+It works for data in approximately the same time period and similar environment, 
+but beyond that, it is not generalizable at all. These methods should be used with 
+great care, if at all.
 
 # References
