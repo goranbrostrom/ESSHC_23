@@ -19,9 +19,13 @@ drawBB2 <- function(dat, main = "", ylim, C = 365 / (log(366))^3,
    xxx <- hazards(fit)
    x <- c(0, xxx[[1]][, 1])
    y <- cumsum(c(0, xxx[[1]][, 2]))
-   
-   plot(x, y, type = "s", main = main, xlab = "Day", axes = FALSE, 
-        ylab = "Cumulative hazards", lwd = 2)
+   if (missing(ylim)){
+       plot(x, y, type = "s", main = main, xlab = "Day", axes = FALSE, 
+            ylab = "Cumulative hazards", lwd = 2)
+   }else{
+       plot(x, y, type = "s", main = main, xlab = "Day", axes = FALSE, 
+            ylab = "Cumulative hazards", lwd = 2, ylim = ylim)
+   }
    lines(c(0, g(365)), c(0, rate * g(365)), lty = 2, col = "blue", lwd = 2)
    att <- c(0, 28, 91, 183, 274, 365)
    axis(1, at = g(att), labels = att)
@@ -42,7 +46,7 @@ drawBB2 <- function(dat, main = "", ylim, C = 365 / (log(366))^3,
    box()
    lines(c(0, g(28)), c(y0, y0), lty = 3, lwd = 0.5, col = "darkgreen")
    lines(c(0, g(28)), c(y1, y1), lty = 3, lwd = 0.5, col = "darkgreen")
-   lines(c(0, g(28)), c(y2, y2), lty = 3, lwd = 0.5, col = "darkgreen")
+   lines(c(0, g(365)), c(y2, y2), lty = 3, lwd = 1.5, col = "darkgreen")
    abline(h = c(y3, y4), lty = 3, lwd = 0.5, col = "darkgreen")
    abline(v = 0, lwd = 0.5)
    lines(c(0, g(28)), c(0, 0), lwd = 0.5)
