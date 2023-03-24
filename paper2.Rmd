@@ -35,7 +35,7 @@ header-includes:
 - \usepackage[figuresonly]{endfloat}
 - \renewcommand{\efloatseparator}{\mbox{}}
 ##- \subsectionfont{\normalfont\normalfont\itshape}
-abstract: "A variation of the Bourgeois-Pichat biometric analysis of infant mortality is suggested. In the original model, cumulative mortality in the last eleven months of infancy is assumed to follow a uniform distribution given a log-cube transformation of age. Instead, we assume an exponential distribution. The difference is that while the denominator is constant in the Bourgeois-Pichat model, equal to the number of births, in our model, the denominator is the current population at risk. We argue that our assumption is more satisfactory from a theoretical point of view, since it focus on the conditional probability of dying. Our model gives different estimates of endogenous and exogenous mortality and, in addition, the model ﬁt is slightly better, especially in cases with higher levels of infant mortality. We use data from northern and southern Sweden for the period 1710 to 1950 to compare the two methods."
+abstract: "A variation of the Bourgeois-Pichat biometric analysis of infant mortality is suggested. In the original model, cumulative mortality in the last eleven months of infancy is assumed to follow a uniform distribution given a log-cube transformation of age. Instead, we assume an exponential distribution. The practical difference is that while the denominators in the estimation are constant in the Bourgeois-Pichat model, equal to the number of births, in our model, the denominators are the sizes of the current populations at risk. We argue that our assumption is more satisfactory from a theoretical point of view, since it focus on the *conditional* probability of dying. Our model gives slightly different estimates of endogenous and exogenous mortality and, in addition, the model ﬁt is often better, especially in cases with higher levels of infant mortality. We use data from northern and southern Sweden for the period 1710 to 1950 to compare the two methods."
 ---
 
 ```{r setup, include=FALSE}
@@ -100,7 +100,7 @@ It makes no difference otherwise.
 
 Assume that a cohort of infants is followed over time from birth to age one. There are no drop-outs 
 (no right censoring except at age 365 days). The exact age in days at each observed death is noted and transformed by $g$, 
-and due to imperfect time measuring there may be tied death ages. As an illustrative example, 
+and due to imperfect time measuring there are often tied death ages. As an illustrative example, 
 we use a data set from northern Sweden, covering the years 1861--1950.
 ```{r readdata}
 infant <- readRDS("Rdata/infant.rds")
@@ -182,8 +182,28 @@ drawBB2(g3, main = "1921-1950", ylim = c(0, 0.11))
 par(oldpar)
 ```
 
-Both methods show an excellent fit to linearity for this data set.
+Both methods show an excellent fit to linearity for this data set. But in order to get
+a close comparison between the Bourgeois-Pichat and the hazards method, we show the hazards
+method in the style of Figure \@ref(fig:first), see Figure \@ref(fig:third).
 
+```{r third, fig.cap = "The hazards method plotted in the Bourgeous-Pichat way."}
+oldpar <- par(mfrow = c(1, 2))
+drawBB2(g1, main = "Type hazards plot", ylim = c(0, 0.12))
+source("R/drawBB.R")
+drawBB(r1, main = "Type Bourgeois-Pichat plot", ylim = c(0, 0.12))
+par(oldpar)
+```
+
+The left hand panel is clearly more informative, we see both the exogenous and the endogenous
+cumulative plots. The dashed blue line in the left hand panel is the exogenous cumulative hazard function,
+while it in the right hand panel is the same function, but shifted upwards 0.027 units.
+It is a consequence of the "paper, pencil and ruler" method used by @bp52a, and it can be
+argued that it gives a visual perception of goodness-of-fit lacking in the left hand panel. 
+But that is not relevant, because the same perception of goodness-of fit is achieved by
+looking at the estimated endogenous cumulative hazard function: It should be a horizontal straight 
+line in the post-neonatal age period.
+
+So in the following graphs, we stick to the hazards plot type.
 
 # Theoretical considerations
 
