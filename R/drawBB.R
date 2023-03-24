@@ -8,11 +8,11 @@ drawBB <- function(rs, main = "", ylim){
    x <- c(0, rs$risktimes)
    y <- c(0, cumsum(rs$n.events / rs$size)) # Nominator differ from "BP"
    if (missing(ylim)){
-      plot(x, y, type = "l", col = "blue", axes = FALSE, xlab = "Day", 
-           ylab = "Cum. death fraction", main = main)
+      plot(x, y, type = "s", col = "black", axes = FALSE, xlab = "Day", 
+           ylab = "Cum. death fraction", main = main, lwd = 2)
    }else{
-      plot(x, y, type = "l", col = "blue", axes = FALSE, xlab = "Day",
-           ylab = "Cumulative hazards", main = main, ylim = ylim)
+      plot(x, y, type = "s", col = "black", axes = FALSE, xlab = "Day",
+           ylab = "Cumulative hazards", main = main, ylim = ylim, lwd = 2)
    }
    att <- c(0, 28, 91, 183, 274, 365)
    axis(1, at = g(att), labels = att)
@@ -30,6 +30,6 @@ drawBB <- function(rs, main = "", ylim){
    y0 <- y1 - x1 * (y2 - y1) / (x2 - x1)
    axis(2, at = round(c(0, y0, y1, y2), 3), las = 1)
    box()
-   lines(c(0, x2), c(y0, y2), type = "l", lty = 2, col = "darkgreen")
+   lines(c(0, x2), c(y0, y2), type = "l", lty = 2, col = "blue", lwd = 2)
    
 }
