@@ -64,7 +64,7 @@ Bourgeois-Pichat also found deviations from the linear death pattern after the f
 
 Bourgeois-Pichat's biometric method has also been used to identify problems with data recording [@wea77; @weasr81]. While a high level of endogenous mortality cannot be used as a criterion for high data quality, the opposite holds true. A very low level of endogenous mortality indeed indicates data problems, just like large deviations from the normal sex ratio at birth do. These two criteria are, in fact, often used in historical studies to evaluate data quality [@bcl04]. They become even more precise if they are applied to different social strata, since under-recording of early deaths often have a social gradient, possibly due to the costs involved in a burial [@tb99; @tbcl99].
 
-We suggest a variation of the Bourgeois-Pichat biometric analysis of infant mortality. Instead of assuming that the cumulative mortality in the last eleven months of infancy follows a uniform distribution, given a log-cube transformation of age, we assume an exponential distribution. The difference is that while the denominator is constant in the Bourgeois-Pichat model, equal to the number of births, in our model, the denominator is the current population at risk. This assumption is more satisfactory from a theoretical point of view, since it models the conditional probability of dying. The growth in birth weight also follows this distribution [@bp51a; @bp51b]. In addition, the model ﬁt is slightly better for our model, especially in cases with high level of infant mortality, common in pre-modern societies. The advantage is that not only is our assumption more attractive from a theoretical point of view, and therefore easier to interpret, but also that it is makes it easier to estimate exogenous and endogenous infant mortality with standard survival analysis programs. We give examples of the two methods using data for 19th and 10th century norhern Sweden, where both mehods fit very well. In addition, we give examples from eighteenth Sweden, where the curve is concave during the last eleven month of infancy, despite high levels of mortality in the first month of life.
+We suggest a variation of the Bourgeois-Pichat biometric analysis of infant mortality. Instead of assuming that the cumulative mortality in the last eleven months of infancy follows a uniform distribution, given a log-cube transformation of age, we assume an exponential distribution. The difference is that while the denominator is constant in the Bourgeois-Pichat model, equal to the number of births, in our model, the denominator is the current population at risk. This assumption is more satisfactory from a theoretical point of view, since it models the conditional probability of dying. The growth in birth weight also follows this distribution [@bp51a; @bp51b]. In addition, the model ﬁt is slightly better for our model, especially in cases with high level of infant mortality, common in pre-modern societies. The advantage is that not only is our assumption more attractive from a theoretical point of view, and therefore easier to interpret, but also that it is makes it easier to estimate exogenous and endogenous infant mortality with standard survival analysis programs. We give examples of the two methods using data for 19th and 20th century norhern Sweden, where both mehods fit very well. In addition, we give examples from 18th century Sweden, where the curve is concave during the last eleven month of infancy, despite high levels of mortality in the first month of life.
 
 # The Bourgeois-Pichat procedure
 
@@ -81,7 +81,7 @@ C = \frac{365}{\log^3(365 + 1)}.
 
 ```{r logcube, fig.cap = "The log-cube transform of time in days versus the identity transform (dashed). Note that g(365) = 365.", fig.height = 7}
 x <- seq(0, 365, length = 366)
-plot(x, g(x), type = "l", xlab = "Days", ylab = "g(Days)", 
+plot(x[1:4], g(x[1:4]), type = "l", xlab = "Days", ylab = "g(Days)", 
      col = "blue", axes = FALSE)
 att <- c(0, 28, 183, 365)
 axis(1, at = att, labels = att)
@@ -627,9 +627,38 @@ is then given by
 \hat{\lambda} = -\frac{log(1 - \hat{p})}{T}.
 \end{equation*}
 
+And so on.
 
+## Biometric analysis on the natural time scale
 
+Given that the exogeneous mortality follows an Exponential distribution on the log-cube scale, it follows that the cumulative hazards function on the natural time scale is
 
+\begin{equation*}
+H(t; \lambda) = \lambda \log^3(t + 1), \; t > 0,
+\end{equation*}
+
+and it follows that the hazard function $h$ is given by
+
+\begin{equation*}
+h(t; \lambda) = \frac{3 \log^2(t + 1)}{t + 1}, \; t > 0,
+\end{equation*}
+
+see Figure \@ref(fig:normal).
+
+```{r normal, fig.cap = "Exogeneos hazard function on the normal time scale."}
+x <- 0:365
+y <- dg(x)
+plot(x, y, type = "l", xlab = "Day", ylab = "Hazards",
+     axes = FALSE, col = "blue", lwd = 2)
+axis(1, at = c(0, 28, 183, 365))
+axis(2, las = 1, at = 0)
+box()
+abline(h = 0, v = 0)
+abline(v = 28, lty = 2, col = "darkgreen")
+```
+
+We. may be relatively confident that the shape is OK in the post-neonatal period, where data are available, but the shape during the neonatal period is a pure guess.
+Examining data with *known* causes of death might be enlightening.
 
 # Biometric analysis in practice
 
@@ -752,7 +781,7 @@ the linearity during the post-neonatal period is gone. Rather, there is a "hocke
 also seen in other old data sets. See Figure \@ref(fig:scahigh).
 
 However, this data set is known to be of very high quality [@tbcl99]. Sex ratio at birth 
-is as expected and the teonatal mortality is high for all social groups. We are therefore inclined to 
+is as expected and the neonatal mortality is high for all social groups. We are therefore inclined to 
 think that the biometric model as it is described here simply is inappropriate during the eighteenth century.
 Specifically, the log-cube transformation, which fits well with 19th century data, seems
 to be completely out of order in the eighteenth century.
@@ -799,8 +828,8 @@ methods in the post-neonatal period..
 ```{r skum, fig.cap = "Skellefteå 1821--1838."}
 library(skum)
 births <- obs[obs$starttyp == 2 &
-                 obs$foddat > as.Date("1820-12-31") &
-                 obs$foddat <= as.Date("1838-12-31"), ]
+                 obs$foddat < as.Date("1839-01-01") &
+                 obs$foddat > as.Date("1820-12-31"), ]
 births$event <- births$sluttyp == 2
 births$enter <- 365 * births$enter
 births$exit <- 365 * births$exit
@@ -818,11 +847,13 @@ If anything, the hazards method never performs worse than the B-P method.
 But the real strength of the hazards method is that it fits naturally into general 
 modern survival analysis with censored and truncated data, and also proportional 
 hazards models with covariates. 
-
+<!--
 On the other hand, the whole business with the 
 biometric analysis and the log-cube transform seems to be highly questionable. 
 It works for data in approximately the same time period and similar environment, 
 but beyond that, it is not generalizable at all. These methods should be used with 
 great care, if at all.
+-->
+Apparently, it works for many places in the mid-twentieth century, but beyond that, it is not generalizable. In fact, also when post-neonatal mortality is following a straight line on the log-cube scale, mortality may well deviate during different parts of the year. This means that the methods should be used with great care and only as a starting point.
 
 # References
