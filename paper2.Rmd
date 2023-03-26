@@ -52,7 +52,6 @@ dg <- function(x) 3 * (log(1 + x))^2 / (1 + x) * 365 / (log(366))^3
 
 # Introduction
 
-
 Jean Bourgeois-Pichat saw the first year of life not only as the period when mortality is highest, but also the period when improvements should be possible 
 [@bp51a; @bp51b; @bp52]. He argued that infant deaths should be divided into two categories, endogenous and exogenous deaths. Endogenous deaths are, by definition, due to inherited factors, or acquired during gestation or delivery. They typically occur at the initial period of life, though sometimes much later and include congenital debility, prematurity, malformations, and disease in early life. Exogenous infant mortality, which Bourgeois-Pichat regards as accidental, are deaths for which the society must hold itself responsible and to reduce endogenous mortality, medical intervention is essential [@bp52]. Since it is, based on causes of deaths, difficult to distinguish between endogenous and exogenous factors, either because they are inaccurate or difficult to make due to the diseases themselves, or the information do not exist, Bourgeois-Pichat offered a solution to the problem.
 
@@ -60,7 +59,7 @@ Bourgeois-Pichat’s biometric model to differentiate between endogenous and exo
 distribution of deaths in the first year of life [@bp52]. He assumes that all deaths taking place in the last eleven months of the first year are exogenous. He argues that, although there are also some endogenous mortalities during this period, they do not affect the development of mortality much. Supported by examples from mid-twentieth century Western and Southern Europe, the US and Canada, New Zeeland, and other countries, Bourgeois-Pichat argued that the cumulative infant deaths after the first month follows a linear development given a log-cube transformation of age [@bp52]. Mortality in the first month of life is then divided into an endogenous and an exogenous assuming that the same linearity also exists in this period. It leads to the conclusion that exogenous deaths in the first 28 days of life represent 22.8 percent of the deaths from the 29th to the 365th day [@bp52; @rp72], or 18.6 percent of the
 total number of exogenous infant deaths.
 
-Bourgeois-Pichat also found deviations from the linear death pattern after the first month, the curve for Sardinia in 1948 bend strongly upward after four months [@bp52, Figure 12]. @knoki77 give ample examples of upward bending curves and argue that they are due to increasing mortality after stopping breast feeding. In Quebec 1944--1947, the curve bends down quite strongly after the sixth month [@bp52, Figure 8]. A downward bend is also what has been found using historical Swedish parish data [@tb99, Figure 6b; @tbcl99, Figures 6 and 7; @lyn98, Figures 1 and 2; @jslgt81, Figure 6d], though less pronounced than in Quebec. The curve for Sweden 1910--1946 show, however, no such downward bend [@bp51b, Figure 9; @bp52].
+Bourgeois-Pichat also found deviations from the linear death pattern after the first month, the curve for Sardinia in 1948 bend strongly upward after four months [@bp52, Figure 12]. @knoki77 give ample examples of upward bending curves and argue that they are due to increasing mortality after stopping breast feeding. In Quebec 1944--1947, the curve bends down quite strongly after the sixth month [@bp52, Figure 8]. A downward bend is also what has been found using historical Swedish parish data [@tb99, Figure 6b; @tbcl99, Figures 6 and 7; @lyn98, Figures 1 and 2; @jslgt81, Figure 6d], though less pronounced than in Quebec. The curve for Sweden 1910--1946 show, however, no such downward bend but a straight line [@bp51b, Figure 9; @bp52].
 
 Bourgeois-Pichat's biometric method has also been used to identify problems with data recording [@wea77; @weasr81]. While a high level of endogenous mortality cannot be used as a criterion for high data quality, the opposite holds true. A very low level of endogenous mortality indeed indicates data problems, just like large deviations from the normal sex ratio at birth do. These two criteria are, in fact, often used in historical studies to evaluate data quality [@bcl04]. They become even more precise if they are applied to different social strata, since under-recording of early deaths often have a social gradient, possibly due to the costs involved in a burial [@tb99; @tbcl99].
 
@@ -79,9 +78,9 @@ where $t$ is age measured in days and $C$ is a normalizing constant,
 C = \frac{365}{\log^3(365 + 1)}.
 \end{equation*}
 
-```{r logcube, fig.cap = "The log-cube transform of time in days versus the identity transform (dashed). Note that g(365) = 365.", fig.height = 7}
+```{r logcube, fig.cap = "The log-cube transform of time in days versus the identity transform (dashed). Note that g(365) = 365.", fig.scap = "The log-cube transform", fig.height = 7}
 x <- seq(0, 365, length = 366)
-plot(x[1:4], g(x[1:4]), type = "l", xlab = "Days", ylab = "g(Days)", 
+plot(x, g(x), type = "l", xlab = "Days", ylab = "g(Days)", 
      col = "blue", axes = FALSE)
 att <- c(0, 28, 183, 365)
 axis(1, at = att, labels = att)
@@ -101,7 +100,14 @@ It makes no difference otherwise.
 Assume that a cohort of infants is followed over time from birth to age one. There are no drop-outs 
 (no right censoring except at age 365 days). The exact age in days at each observed death is noted and transformed by $g$, 
 and due to imperfect time measuring there are often tied death ages. As an illustrative example, 
-we use a data set from northern Sweden, covering the years 1861--1950.
+we use a data set from Västerbotten in northern Sweden, covering the years 1861--1950, see 
+Figure \@ref(fig:vbmap).
+
+```{r vbmap, fig.cap="Västerbotten."}
+knitr::include_graphics("Slides/myfigs/vb.png")
+```
+
+
 ```{r readdata}
 infant <- readRDS("Rdata/infant.rds")
 infant$month <- months(infant$birthdate)
@@ -186,7 +192,7 @@ Both methods show an excellent fit to linearity for this data set. But in order 
 a close comparison between the Bourgeois-Pichat and the hazards method, we show the hazards
 method in the style of Figure \@ref(fig:first), see Figure \@ref(fig:third).
 
-```{r third, fig.cap = "The hazards method plotted in the Bourgeous-Pichat way."}
+```{r third, fig.cap = "The hazards method plotted in the Bourgeous-Pichat way, Västerbotten 1861--1890."}
 oldpar <- par(mfrow = c(1, 2))
 drawBB2(g1, main = "Type hazards plot", ylim = c(0, 0.12))
 source("R/drawBB.R")
@@ -197,7 +203,7 @@ par(oldpar)
 The left hand panel is clearly more informative, we see both the exogenous and the endogenous
 cumulative plots. The dashed blue line in the left hand panel is the exogenous cumulative hazard function,
 while it in the right hand panel is the same function, but shifted upwards 0.027 units.
-It is a consequence of the "paper, pencil and ruler" method used by @bp52a, and it can be
+It is a consequence of the "paper, pencil and ruler" method used by @bp51a, and it can be
 argued that it gives a visual perception of goodness-of-fit lacking in the left hand panel. 
 But that is not relevant, because the same perception of goodness-of fit is achieved by
 looking at the estimated endogenous cumulative hazard function: It should be a horizontal straight 
@@ -432,7 +438,7 @@ y <- c(0, 1000 * cumsum(hneo[[1]][, 2]))
 Next, take the difference between "Total" and "Exogenous", as in Equation \@ref(eq:endog) to get "Endogenous",
 the result is shown in Figure \@ref(fig:enof).
 
-```{r enof, fig.cap = "Cumulative hazard functions for neonatal mortality, Västerbotten.", fig.width = 7}
+```{r enof, fig.cap = "Cumulative hazard functions for neonatal mortality, Västerbotten 1861--1950.", fig.width = 7}
 yen <- y - 1000 * rate * x ##"Endo"
 par(las = 1)
 plot(x, yen, type = "s", col = "red", xlab = "Day", ylab = "by 1000", ylim = c(0, 36), axes = FALSE)
@@ -501,7 +507,7 @@ dat$enter <- 365 * dat$enter # NOTE!
 dat$exit <- 365 * dat$exit # NOTE!
 ```
 
-```{r plotcohort, fig.cap = "By birth month, cohorts, Västerbotten 1861-1950.", fig.height = 8, eval = TRUE}
+```{r plotcohort, fig.cap = "By birth month, cohorts, Västerbotten 1861--1950.", fig.height = 8, eval = TRUE}
 oldpar <- par(mfrow = c(1, 1))
 dato <- dat[dat$birthdate < as.Date("1950-12-31"), ]
 fit <- coxreg(Surv(g(enter), g(exit), event) ~ strata(bmonth), data = dato)
@@ -552,7 +558,7 @@ no problems during the neonatal phase, but then comes the tough winter months.
 
 ### Periods by month
 
-```{r plotcohort3, fig.cap = "By month, period data, Västerbotten 1861-1950.", fig.height = 8, eval = TRUE}
+```{r plotcohort3, fig.cap = "By month, period data, Västerbotten 1861--1950.", fig.height = 8, eval = TRUE}
 oldpar <- par(mfrow = c(1, 1))
 dato <- dat[dat$birthdate < as.Date("1950-12-31"), ]
 fit <- coxreg(Surv(g(enter), g(exit), event) ~ strata(month), data = dato)
@@ -584,7 +590,7 @@ par(oldpar)
 ```
 
 
-```{r plotperiod, fig.cap = "By calendar month, period data, Västerbotten 1861-1950.", fig.height = 9, eval = FALSE}
+```{r plotperiod, fig.cap = "By calendar month, period data, Västerbotten 1861--1950.", fig.height = 9, eval = FALSE}
 oldpar <- par(mfrow = c(4, 3))
 for (mon in levels(dat$bmonth)){
     drawBB2(dat[dat$month == mon, ], main = mon, printLegend = FALSE)
@@ -773,9 +779,15 @@ fit and endogenous dominance in the very early days of life.
 However, the B-P method seems to have a slight upper hand regarding model fit.
 
 
-## Scania 1710--1800.
+## Skåne 1710--1800.
 
-The Scanian dataset covers five parishes in Scania 1710--1800 [@sedd].
+Skåne is the southernmost province of Sweden, see the map in Figure \@ref(fig:scaniamap).
+
+```{r scaniamap, fig.cap = "Skåne."}
+knitr::include_graphics("Slides/myfigs/scania.png")
+```
+
+This dataset covers five parishes i n Skåne 1710--1800 [@sedd].
 It is an interesting case because it appears as if the data quality is low since 
 the linearity during the post-neonatal period is gone. Rather, there is a "hockey-stick" pattern, 
 also seen in other old data sets. See Figure \@ref(fig:scahigh).
@@ -786,7 +798,7 @@ think that the biometric model as it is described here simply is inappropriate d
 Specifically, the log-cube transformation, which fits well with 19th century data, seems
 to be completely out of order in the eighteenth century.
 
-```{r scahigh, fig.cap = "Scania 1710--1800."}
+```{r scahigh, fig.cap = "Skåne 1710--1800."}
 sca1 <- readRDS("Rdata/sca1.rds")
 sca1 <- sca1[sca1$BirthDate < "1801-01-01", ]
 sca11 <- sca1
