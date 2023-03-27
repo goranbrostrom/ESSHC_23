@@ -84,7 +84,7 @@ Västerbotten 1801--1950
 
 ## Comparison 
 
-\includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/both-1.pdf}
+\includegraphics[width=0.8\textwidth]{../GBTB23_files/figure-latex/both-1.pdf}
 
 ## Cumulative hazards, neonatal mortality, Västerbotten 1861-1950
 
