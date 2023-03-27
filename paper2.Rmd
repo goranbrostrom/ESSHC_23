@@ -100,7 +100,7 @@ It makes no difference otherwise.
 Assume that a cohort of infants is followed over time from birth to age one. There are no drop-outs 
 (no right censoring except at age 365 days). The exact age in days at each observed death is noted and transformed by $g$, 
 and due to imperfect time measuring there are often tied death ages. As an illustrative example, 
-we use a data set from Västerbotten in northern Sweden, covering the years 1861--1950, see 
+we use a data set from Västerbotten in northern Sweden, covering $221\,773$ births with $17\,675$ infant deaths over the years 1861--1950, see 
 Figure \@ref(fig:vbmap).
 
 ```{r vbmap, fig.cap="Västerbotten."}
@@ -787,7 +787,7 @@ Skåne is the southernmost province of Sweden, see the map in Figure \@ref(fig:s
 knitr::include_graphics("Slides/myfigs/scania.png")
 ```
 
-This dataset covers five parishes i n Skåne 1710--1800 [@sedd].
+This dataset covers five parishes and 7461 births with 1654 infant deaths in Skåne 1710--1800 [@sedd].
 It is an interesting case because it appears as if the data quality is low since 
 the linearity during the post-neonatal period is gone. Rather, there is a "hockey-stick" pattern, 
 also seen in other old data sets. See Figure \@ref(fig:scahigh).
@@ -796,7 +796,8 @@ However, this data set is known to be of very high quality [@tbcl99]. Sex ratio 
 is as expected and the neonatal mortality is high for all social groups. We are therefore inclined to 
 think that the biometric model as it is described here simply is inappropriate during the eighteenth century.
 Specifically, the log-cube transformation, which fits well with 19th century data, seems
-to be completely out of order in the eighteenth century.
+to be completely out of order in the eighteenth century, maybe due to the high infant mortality,
+which in this dataset is 222 per thousand. 
 
 ```{r scahigh, fig.cap = "Skåne 1710--1800."}
 sca1 <- readRDS("Rdata/sca1.rds")
