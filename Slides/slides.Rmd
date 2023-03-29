@@ -1,14 +1,15 @@
 ---
-title: A hazards approach to the biometric analysis of infant mortality
+title: "A hazards approach to the biometric analysis of infant mortality"
 author:
-    - Göran Broström\inst{1}
-    - Tommy Bengtsson\inst{2}
+- Göran Broström\inst{1}
+- Tommy Bengtsson\inst{2}
 institute:
-    - \inst{1}CEDAR, Umeå University (gb@ehar.se, https://github.com/goranbrostrom)
-    - \inst{2}CED, Lund University (tommy.bengtsson@ekh.lu.se)
+- \inst{2}CED, Lund University (tommy.bengtsson@ekh.lu.se)
+- \inst{1}CEDAR, Umeå University (gb@ehar.se, https://github.com/goranbrostrom)
 output:
   beamer_presentation:
     theme: Warsaw
+classoption: t
 ---
 
 ```{r setup, include=FALSE}
@@ -25,9 +26,25 @@ par(cex.axis = 1.2)
 *   Theoretical considerations
 *   Real-world examples.
 
-## The log-cube transform
+## Bourgeois-Pichat and causes of death
 
-\begin{columns}
+*   Two categories: 
+    *   Endogenous: *inherited*, *delivery*, etc.
+    *   Exogenous: *accidental*, *infectious diseases*, etc.
+*   How to differentiate between the two categories without infornation of causes of death?
+
+Bourgeois-Pichat's Biometric model.
+
+## The biometric model
+
+Two postulates:
+
+1.  Endogenous deaths only occur during the neonatal period (0--28 days). 
+2.  On a specific time scale, exogenous infant mortality is uniformly distributed.
+
+## The log-cube transform {.t}
+
+\begin{columns}[T]
 \begin{column}{0.6\textwidth}
 \begin{equation*}
 g(t) = C \log^3(t + 1), \; 0 < t \le 365.
@@ -38,6 +55,10 @@ where $C$ is a normalizing constant:
 \begin{equation*}
 C = \frac{365}{\log^3(365 + 1)}
 \end{equation*}
+
+\tiny
+\emph{Note:} $C$ is not part of B-P's original definition.
+
 \end{column}
 
 \begin{column}{0.5\textwidth}
@@ -45,6 +66,145 @@ C = \frac{365}{\log^3(365 + 1)}
 \end{column}
 
 \end{columns}
+
+## Demonstration of the B-P plot
+
+Assume 100 births, of which 90 survives infancy, ten death ages: 
+
+2, 6, 10, 15, 25, 41, 90, 120, 180, 319.
+
+```{r bpex, fig.height = 4}
+C <- 365 / (log(365 + 1))^3
+g <- function(x) C * (log(x + 1))^3
+d <- c(2, 6, 10, 15, 25, 41, 90, 120, 180, 319)
+h <- seq_along(d) / 100
+plot(g(d), h, type = "b", lty = 3, xlab = "Day", axes = FALSE, ylab = "Deaths / 100", 
+     ylim = c(0, 0.11), xlim = c(0, 365))
+axis(2, las = 1)
+abline(h = 0, v = c(0, 365))
+axis(1, at = g(d), labels = d)
+axis(3, at = c(0, g(28), 365), labels = c(0, 28, 365))
+box()
+abline(v = g(28), lty = 2, col = "magenta")
+text(g(12), 0.08, "Neonatal", col = "red")
+text(g(130), 0.04, "Post-neonatal", col = "blue")
+```
+
+Calculation (no ties): $\frac{1}{100}, \frac{2}{100}, \frac{3}{100}, \ldots, \frac{10}{100}.$ 
+
+<!--
+\begin{equation*}
+p_n = \frac{n}{100}, \; n = 1, \ldots 10
+\end{equation*}
+-->
+
+## Demonstration of the B-P plot II
+
+Assume 100 births, of which 90 survives infancy, ten death ages: 
+
+2, 6, 10, 15, 25, 41, 90, 120, 180, 319.
+
+```{r bpex2, fig.height = 4}
+C <- 365 / (log(365 + 1))^3
+g <- function(x) C * (log(x + 1))^3
+d <- c(2, 6, 10, 15, 25, 41, 90, 120, 180, 319)
+h <- seq_along(d) / 100
+plot(g(d), h, type = "b", lty = 3, xlab = "Day", axes = FALSE, ylab = "Deaths / 100", 
+     ylim = c(0, 0.11), xlim = c(0, 365))
+
+abline(h = 0, v = c(0, 365))
+axis(1, at = g(d), labels = d)
+axis(3, at = c(0, g(28), 365), labels = c(0, 28, 365))
+box()
+abline(v = g(28), lty = 2, col = "magenta")
+text(g(12), 0.08, "Exogenous", col = "blue")
+text(g(12), 0.03, "Endogenous", col = "red")
+points(g(c(41, 319)), c(6/100, 10/100), col = "blue", lwd = 2)
+##
+fy <- function(x, xc, yc){
+    yc[1] + (yc[2] - yc[1]) / (xc[2] - xc[1]) * (x - xc[1])
+}
+x1 <- g(41)
+y1 <- 6/100
+x2 <- g(319)
+y2 <- 10/100
+x0 <- 0
+x3 <- g(319)
+y0 <- fy(x0, c(x1, x2), c(y1, y2))
+y3 <- fy(x3, c(x1, x2), c(y1, y2))
+lines(c(x0, x3), c(y0, y3), lty = 2)
+axis(2, las = 1, at = c(0, y0, y3), labels = round(c(0, y0, y3), 3))
+lines(c(0, g(319)), c(y3, y3), lty = 2)
+lines(c(0, 0), c(0, y0), col = "red", lwd = 3)
+lines(c(0, 0), c(y0, y3), col = "blue", lwd = 3)
+```
+
+Calculation (no ties): $\frac{1}{100}, \frac{2}{100}, \frac{3}{100}, \ldots, \frac{10}{100}.$ 
+
+<!--
+\begin{equation*}
+p_n = \frac{n}{100}, \; n = 1, \ldots 10
+\end{equation*}
+-->
+
+## Explanation of the hazards plot
+
+Assume 100 births, of which 90 survives infancy, ten death ages: 
+
+2, 6, 10, 15, 25, 41, 90, 120, 180, 319 (same as before).
+
+```{r hazex, fig.height = 4}
+C <- 365 / (log(365 + 1))^3
+g <- function(x) C * (log(x + 1))^3
+d <- c(2, 6, 10, 15, 25, 41, 90, 120, 180, 319)
+h <- seq_along(d) / (100:91)
+plot(g(d), h, type = "b", lty = 1, xlab = "Day", axes = FALSE, ylab = "Cumulative hazards", 
+     ylim = c(0, 0.11), xlim = c(0, 365))
+h2 <-  seq_along(d) / 100
+lines(g(d), h2, type = "b", lty = 3) 
+axis(2, las = 1)
+abline(h = 0, v = c(0, 365))
+axis(1, at = g(d), labels = d)
+axis(3, at = c(0, g(28), 365), labels = c(0, 28, 365))
+box()
+abline(v = g(28), lty = 2, col = "magenta")
+text(g(12), 0.08, "Neonatal", col = "red")
+text(g(130), 0.04, "Post-neonatal", col = "blue")
+ttt <- sum(g(c(41, 90, 120, 180, 319))) + 90 * (g(365) - g(28))
+
+```
+
+Calculation (no ties): $\frac{1}{100}, \frac{2}{99}, \frac{3}{98}, \ldots, \frac{10}{91}.$ 
+
+## Explanation of the hazards plot II
+
+Assume 100 births, of which 90 survives infancy, ten death ages: 
+
+2, 6, 10, 15, 25, 41, 90, 120, 180, 319 (same as before).
+
+```{r hazex2, fig.height = 4}
+C <- 365 / (log(365 + 1))^3
+g <- function(x) C * (log(x + 1))^3
+d <- c(2, 6, 10, 15, 25, 41, 90, 120, 180, 319)
+h <- seq_along(d) / (100:91)
+plot(g(d), h, type = "b", lty = 1, xlab = "Day", axes = FALSE, ylab = "Cumulative hazards", 
+     ylim = c(0, 0.11), xlim = c(0, 365))
+
+axis(2, las = 1)
+abline(h = 0, v = c(0, 365))
+axis(1, at = g(d), labels = d)
+axis(3, at = c(0, g(28), 365), labels = c(0, 28, 365))
+box()
+abline(v = g(28), lty = 2, col = "magenta")
+text(g(12), 0.08, "Neonatal", col = "red")
+text(g(130), 0.04, "Exogenous", col = "blue")
+ttt <- sum(g(c(41, 90, 120, 180, 319))) + 90 * (g(365) - g(28))
+lambda <- 5 / ttt
+x <- g(0:365)
+y <- Hweibull(x, shape = 1, scale = 1 / lambda)
+lines(x, y, lty = 2, col = "blue")
+```
+
 
 ## Earlier work 
 
@@ -84,7 +244,9 @@ Västerbotten 1801--1950
 
 ## Comparison 
 
-\includegraphics[width=0.8\textwidth]{../GBTB23_files/figure-latex/both-1.pdf}
+Remove?
+
+\includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/both-1.pdf}
 
 ## Cumulative hazards, neonatal mortality, Västerbotten 1861-1950
 
