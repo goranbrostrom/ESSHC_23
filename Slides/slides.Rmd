@@ -71,23 +71,25 @@ C = \frac{365}{\log^3(365 + 1)}
 
 Assume 100 births, of which 90 survives infancy, ten death ages: 
 
-2, 6, 10, 15, 25, 41, 90, 120, 180, 319.
+2, 6, 10, 15, 25, 41, 90, 120, 180, 309.
 
-```{r bpex, fig.height = 4}
+```{r bpex, fig.height = 5}
+par(lwd = 2)
 C <- 365 / (log(365 + 1))^3
 g <- function(x) C * (log(x + 1))^3
-d <- c(2, 6, 10, 15, 25, 41, 90, 120, 180, 319)
+d <- c(2, 6, 10, 15, 25, 41, 90, 120, 180, 309)
 h <- seq_along(d) / 100
-plot(g(d), h, type = "b", lty = 3, xlab = "Day", axes = FALSE, ylab = "Deaths / 100", 
-     ylim = c(0, 0.11), xlim = c(0, 365))
+plot(g(d), h, type = "b", lty = 1, xlab = "Day", axes = FALSE, ylab = "Deaths / 100", 
+     ylim = c(0, 0.12), xlim = c(0, 365))
 axis(2, las = 1)
 abline(h = 0, v = c(0, 365))
 axis(1, at = g(d), labels = d)
 axis(3, at = c(0, g(28), 365), labels = c(0, 28, 365))
 box()
 abline(v = g(28), lty = 2, col = "magenta")
-text(g(12), 0.08, "Neonatal", col = "red")
-text(g(130), 0.04, "Post-neonatal", col = "blue")
+text(30, 0.11, "Neonatal", col = "red")
+text(110, 0.11, "Post-neonatal", col = "blue")
+points(g(c(41, 309)), c(6/100, 10/100), col = "red", lwd = 2, pch = 4)
 ```
 
 Calculation (no ties): $\frac{1}{100}, \frac{2}{100}, \frac{3}{100}, \ldots, \frac{10}{100}.$ 
@@ -102,14 +104,15 @@ p_n = \frac{n}{100}, \; n = 1, \ldots 10
 
 Assume 100 births, of which 90 survives infancy, ten death ages: 
 
-2, 6, 10, 15, 25, 41, 90, 120, 180, 319.
+2, 6, 10, 15, 25, 41, 90, 120, 180, 309.
 
-```{r bpex2, fig.height = 4}
+```{r bpex2, fig.height = 5}
+par(lwd = 2)
 C <- 365 / (log(365 + 1))^3
 g <- function(x) C * (log(x + 1))^3
-d <- c(2, 6, 10, 15, 25, 41, 90, 120, 180, 319)
+d <- c(2, 6, 10, 15, 25, 41, 90, 120, 180, 309)
 h <- seq_along(d) / 100
-plot(g(d), h, type = "b", lty = 3, xlab = "Day", axes = FALSE, ylab = "Deaths / 100", 
+plot(g(d), h, type = "b", lty = 1, xlab = "Day", axes = FALSE, ylab = "Deaths / 100", 
      ylim = c(0, 0.11), xlim = c(0, 365))
 
 abline(h = 0, v = c(0, 365))
@@ -117,24 +120,24 @@ axis(1, at = g(d), labels = d)
 axis(3, at = c(0, g(28), 365), labels = c(0, 28, 365))
 box()
 abline(v = g(28), lty = 2, col = "magenta")
-text(g(12), 0.08, "Exogenous", col = "blue")
-text(g(12), 0.03, "Endogenous", col = "red")
-points(g(c(41, 319)), c(6/100, 10/100), col = "blue", lwd = 2)
+text(g(12), 0.08, "Exogenous", col = "blue", cex = 0.8)
+text(g(12), 0.03, "Endogenous", col = "red", cex = 0.8)
+points(g(c(41, 309)), c(6/100, 10/100), col = "blue", lwd = 2)
 ##
 fy <- function(x, xc, yc){
     yc[1] + (yc[2] - yc[1]) / (xc[2] - xc[1]) * (x - xc[1])
 }
 x1 <- g(41)
 y1 <- 6/100
-x2 <- g(319)
+x2 <- g(309)
 y2 <- 10/100
 x0 <- 0
-x3 <- g(319)
+x3 <- g(309)
 y0 <- fy(x0, c(x1, x2), c(y1, y2))
 y3 <- fy(x3, c(x1, x2), c(y1, y2))
-lines(c(x0, x3), c(y0, y3), lty = 2)
+lines(c(x0, x3), c(y0, y3), lty = 2, lwd = 1)
 axis(2, las = 1, at = c(0, y0, y3), labels = round(c(0, y0, y3), 3))
-lines(c(0, g(319)), c(y3, y3), lty = 2)
+lines(c(0, g(309)), c(y3, y3), lty = 2, lwd = 1)
 lines(c(0, 0), c(0, y0), col = "red", lwd = 3)
 lines(c(0, 0), c(y0, y3), col = "blue", lwd = 3)
 ```
@@ -147,63 +150,117 @@ p_n = \frac{n}{100}, \; n = 1, \ldots 10
 \end{equation*}
 -->
 
-## Explanation of the hazards plot
+## The hazards plot
 
 Assume 100 births, of which 90 survives infancy, ten death ages: 
 
-2, 6, 10, 15, 25, 41, 90, 120, 180, 319 (same as before).
+2, 6, 10, 15, 25, 41, 90, 120, 180, 309 (same as before).
 
-```{r hazex, fig.height = 4}
+```{r hazex, fig.height = 5}
+par(lwd = 2)
 C <- 365 / (log(365 + 1))^3
 g <- function(x) C * (log(x + 1))^3
-d <- c(2, 6, 10, 15, 25, 41, 90, 120, 180, 319)
+d <- c(2, 6, 10, 15, 25, 41, 90, 120, 180, 309)
 h <- seq_along(d) / (100:91)
 plot(g(d), h, type = "b", lty = 1, xlab = "Day", axes = FALSE, ylab = "Cumulative hazards", 
-     ylim = c(0, 0.11), xlim = c(0, 365))
+     ylim = c(0, 0.12), xlim = c(0, 365))
 h2 <-  seq_along(d) / 100
-lines(g(d), h2, type = "b", lty = 3) 
+lines(g(d), h2, type = "b", lty = 3, lwd = 1) 
 axis(2, las = 1)
 abline(h = 0, v = c(0, 365))
 axis(1, at = g(d), labels = d)
 axis(3, at = c(0, g(28), 365), labels = c(0, 28, 365))
 box()
 abline(v = g(28), lty = 2, col = "magenta")
-text(g(12), 0.08, "Neonatal", col = "red")
-text(g(130), 0.04, "Post-neonatal", col = "blue")
-ttt <- sum(g(c(41, 90, 120, 180, 319))) + 90 * (g(365) - g(28))
+text(g(12), 0.11, "Neonatal", col = "red")
+text(g(110), 0.11, "Post-neonatal", col = "blue")
+ttt <- sum(g(c(41, 90, 120, 180, 309))) + 90 * (g(365) - g(28))
 
 ```
 
 Calculation (no ties): $\frac{1}{100}, \frac{2}{99}, \frac{3}{98}, \ldots, \frac{10}{91}.$ 
 
-## Explanation of the hazards plot II
+## The hazards plot II
 
-Assume 100 births, of which 90 survives infancy, ten death ages: 
+<!-- Assume 100 births, of which 90 survives infancy, ten death ages: 
 
 2, 6, 10, 15, 25, 41, 90, 120, 180, 319 (same as before).
+-->
 
-```{r hazex2, fig.height = 4}
+```{r hazex2, fig.height = 5}
+par(mai = c(1,1,1,1), lwd = 2)
 C <- 365 / (log(365 + 1))^3
 g <- function(x) C * (log(x + 1))^3
-d <- c(2, 6, 10, 15, 25, 41, 90, 120, 180, 319)
+d <- c(2, 6, 10, 15, 25, 41, 90, 120, 180, 309)
 h <- seq_along(d) / (100:91)
 plot(g(d), h, type = "b", lty = 1, xlab = "Day", axes = FALSE, ylab = "Cumulative hazards", 
-     ylim = c(0, 0.11), xlim = c(0, 365))
+     ylim = c(0, 0.13), xlim = c(0, 365))
 
 axis(2, las = 1)
 abline(h = 0, v = c(0, 365))
-axis(1, at = g(d), labels = d)
-axis(3, at = c(0, g(28), 365), labels = c(0, 28, 365))
+axis(1, at = g(c(d, 365)), labels = c(d, 365))
+tabb <- g(c(0, 28, 41, 90,120, 180, 309, 365))
+axis(3, at = tabb, labels = round(tabb))
 box()
 abline(v = g(28), lty = 2, col = "magenta")
-text(g(12), 0.08, "Neonatal", col = "red")
-text(g(130), 0.04, "Exogenous", col = "blue")
-ttt <- sum(g(c(41, 90, 120, 180, 319))) + 90 * (g(365) - g(28))
+##text(g(12), 0.08, "Neonatal", col = "red")
+text(g(130), 0.11, "Total")
+text(g(130), 0.05, "Exogenous", col = "blue")
+ttt <- sum(g(c(41, 90, 120, 180, 319) - 28)) + 90 * (g(365) - g(28))
 lambda <- 5 / ttt
 x <- g(0:365)
 y <- Hweibull(x, shape = 1, scale = 1 / lambda)
 lines(x, y, lty = 2, col = "blue")
+axis(4, at = c(0, y[366], h[10]), labels = round(c(0, y[366], h[10]), 3), las = 1)
+lines(c(365, 365), c(0, y[366]), col = "blue", lwd = 3)
+lines(c(365, 365), c(y[366], h[10]), col = "red", lwd = 3)
+text(30, 0.12, "Neonatal", col = "red", cex = 0.8)
+text(110, 0.12, "Post-neonatal", col = "blue", cex = 0.8)
 ```
+
+Exogenous slope = $\frac{\#\text{(post deaths)}}{\text{post exposure}} = \frac{5}{27626} \approx 0.00018$
+
+Post exposure = $90 (365 - 68) + (93 - 68) + (163 - 68) + \cdots + (335 - 68) \approx 27626$
+
+## Adding the endogenous mortality
+
+```{r hazex3, fig.height = 5}
+par(mai = c(1,1,1,1), lwd = 2)
+C <- 365 / (log(365 + 1))^3
+g <- function(x) C * (log(x + 1))^3
+d <- c(2, 6, 10, 15, 25, 41, 90, 120, 180, 309)
+h <- seq_along(d) / (100:91)
+plot(g(d), h, type = "b", lty = 1, xlab = "Day", axes = FALSE, ylab = "Cumulative hazards", 
+     ylim = c(0, 0.13), xlim = c(0, 365))
+
+axis(2, las = 1)
+abline(h = 0, v = c(0, 365))
+axis(1, at = g(c(d, 365)), labels = c(d, 365))
+tabb <- g(c(0, 28, 41, 90,120, 180, 309, 365))
+##axis(3, at = tabb, labels = round(tabb))
+box()
+abline(v = g(28), lty = 2, col = "magenta")
+##text(g(12), 0.08, "Neonatal", col = "red")
+text(g(130), 0.11, "Total")
+text(g(130), 0.02, "Exogenous", col = "blue")
+text(g(130), 0.06, "Endogenous", col = "red")
+ttt <- sum(g(c(41, 90, 120, 180, 319) - 28)) + 90 * (g(365) - g(28))
+lambda <- 5 / ttt
+x <- g(0:365)
+y <- Hweibull(x, shape = 1, scale = 1 / lambda)
+lines(x, y, lty = 2, col = "blue")
+axis(4, at = c(0, y[366], h[10]), labels = round(c(0, y[366], h[10]), 3), las = 1)
+lines(c(365, 365), c(0, y[366]), col = "blue", lwd = 3)
+lines(c(365, 365), c(y[366], h[10]), col = "red", lwd = 3)
+text(30, 0.12, "Neonatal", col = "red", cex = 0.8)
+text(110, 0.12, "Post-neonatal", col = "blue", cex = 0.8)
+## Add neonatal:
+xn <- g(d)
+yn <- h - Hweibull(xn, shape = 1, scale = 1 / lambda)
+lines(xn, yn, type = "l", col = "red", lty = 4)
+```
+
+
 
 
 ## Earlier work 
