@@ -220,6 +220,8 @@ text(110, 0.12, "Post-neonatal", col = "blue", cex = 0.8)
 
 Exogenous slope = $\frac{\#\text{(post deaths)}}{\text{post exposure}} = \frac{5}{27626} \approx 0.00018$
 
+\tiny
+
 Post exposure = $90 (365 - 68) + (93 - 68) + (163 - 68) + \cdots + (335 - 68) \approx 27626$
 
 ## Adding the endogenous mortality
@@ -254,10 +256,11 @@ lines(c(365, 365), c(0, y[366]), col = "blue", lwd = 3)
 lines(c(365, 365), c(y[366], h[10]), col = "red", lwd = 3)
 text(30, 0.12, "Neonatal", col = "red", cex = 0.8)
 text(110, 0.12, "Post-neonatal", col = "blue", cex = 0.8)
-## Add neonatal:
+## Add endogenous:
 xn <- g(d)
 yn <- h - Hweibull(xn, shape = 1, scale = 1 / lambda)
 lines(xn, yn, type = "l", col = "red", lty = 4)
+lines(c(g(28), g(309)), c(yn[6], yn[6]), lty = 4, lwd = 1)
 ```
 
 
@@ -265,11 +268,17 @@ lines(xn, yn, type = "l", col = "red", lty = 4)
 
 ## Earlier work 
 
-*   Knodel \& Kintner (1977) 
+*   Knodel \& Kintner (1977).
+    *    Discusses effects of breastfeeding habits.
 *   Wrigley (1977).
+    *    Problems with data recording.
 *   Lynch, Greenhouse \& Brändström (1998).
+    *    Mentions "constant hazard".
+    *    Suggest linear regression methods.
 *   Bengtsson (1999).
+    *    Data quality.
 *   Manfredini (2004).
+    *    Deals with effect of climate variation.
 
 
 ## Study areas
@@ -299,6 +308,46 @@ Västerbotten 1801--1950
 
 \includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/bioume9120-1.pdf}
 
+## Cohort effect of birth month, Västerbotten 
+
+\begin{columns}
+\begin{column}{0.6\textwidth}
+
+\includegraphics[width=0.8\textwidth,height=0.7\textheight]{../paper2_files/figure-latex/plotcohort-1.pdf}
+
+\end{column}
+
+\begin{column}{0.4\textwidth}
+
+Conclusion:
+\vspace{2\baselineskip}
+
+Post-neonatal linearity is a population property, not an individual.
+\end{column}
+
+\end{columns}
+
+
+## Period effect of month, Västerbotten
+
+\begin{columns}
+
+\begin{column}{0.6\textwidth}
+
+\includegraphics[width=0.8\textwidth,height=0.7\textheight]{../paper2_files/figure-latex/plotcohort3-1.pdf}
+
+\end{column}
+
+\begin{column}{0.4\textwidth}
+
+Looks quite proportional!
+
+\end{column}
+
+\end{columns}
+
+
+<!--
 ## Comparison 
 
 Remove?
@@ -325,6 +374,7 @@ Remove?
 
 \includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/postneo-1.pdf}
 
+-->
 
 ## Scania 1711--1800
 
