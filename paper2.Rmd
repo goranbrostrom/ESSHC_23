@@ -832,7 +832,7 @@ lines(x, z, col = "red")
 
 --->
 
-## Skellefteå 1820--1835
+## Skellefteå 1821--1838
 
 An example of severe under-registration during the neonatal period, see Figure \@ref(fig:skum).
 There is no room for endogenous deaths at all, but otherwise a reasonably good fit with both 

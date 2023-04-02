@@ -381,7 +381,7 @@ Remove?
 \includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/scahigh-1.pdf}
 
 
-## 
+## Skellefteå 1801--1820
 
 \includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/skum-1.pdf}
 
@@ -389,4 +389,11 @@ Remove?
 
 ## Conclusions
 
-*   Good
+*   Advantages of the hazards method.
+       *    Fits naturally into modern survival analysis, allows censored and truncated data, and 
+       *   The exogenous component forms a class of proportional hazards distributions.
+    
+*   Restriction for both models.
+    *   Models for populations, not for individuals.
+    *   Less useful for traditional survival analysis.
+    *.  The log-cube transform is not universal.
