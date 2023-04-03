@@ -663,8 +663,36 @@ abline(h = 0, v = 0)
 abline(v = 28, lty = 2, col = "darkgreen")
 ```
 
-We. may be relatively confident that the shape is OK in the post-neonatal period, where data are available, but the shape during the neonatal period is a pure guess.
+We may be relatively confident that the shape is OK in the post-neonatal period, where data are available, but the shape during the neonatal period is a pure guess.
 Examining data with *known* causes of death might be enlightening.
+
+We repeat the hazards method for Västerbotten 1961--1890 on both the log-cube 
+and the natural time scales for comparison, see Figure \@ref(fig:natlogcube2).
+
+```{r natlogcube2, fig.cap = "Västerbotten 1861-1890, log-cube and natural time scales."}
+par(mfrow = c(1, 2), las = 1, lwd = 2)
+rate <- drawBB2(g1, main = "Log-cube", ylim = c(0, 0.11))
+fit <- coxreg(Surv(enter, exit, event) ~ 1, data = g1)
+##plot(fit, main = "Natural", lwd = 3)
+hz <- hazards(fit)
+x <- c(0, hz[[1]][, 1])
+y1 <- c(0, cumsum(hz[[1]][, 2]))
+plot(x, y1, type = "l", axes = FALSE, xlab = "Days", main = "Natural",
+     ylab = "Cumulative hazards", ylim = c(0, 0.11))
+axis(1, at = c(0, 28, 91, 183, 274, 365))
+axis(2, at = c(0, 0.015, 0.027, 0.042, 0.080, 0.108))
+box()
+
+abline(v = 28, lty = 2, lwd = 1)
+abline(h = 0, lwd = 1)
+y <- g(x) * rate
+lines(x, y, lty = 2, col = "blue")
+## And the Endogenous:
+y2 <- y1 - y
+lines(x, y2, lty = 4, col = "red")
+```
+
+The picture on the natural time scale is of course what we prefer, so why did Bourgeois-Pichat use the log-cube time transform instead of the log-cube cumulative hazards function? The answer is of course that he had no access to a computer back in the fifties, and his way of compensating for that was in fact very clever. Similar pencil-and-ruler techniques have earlier been used, for instance in *Weibull probability plotting* [@ww51].
 
 # Biometric analysis in practice
 
