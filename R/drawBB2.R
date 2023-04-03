@@ -37,8 +37,8 @@ drawBB2 <- function(dat, main = "", ylim, C = 365 / (log(366))^3,
    y1 <- y[n]
    red <- y[1:n] - x[1:n] * rate
    redall <- y - x * rate
-   lines(x[1:n], red, col = "red", type = "s", lty = 4, lwd = 2)
-   lines(x, redall, col ="magenta", type = "s", lty = 3, lwd = 2)
+   lines(x[1:n], red, col = "red", type = "l", lty = 4, lwd = 2)
+   lines(x, redall, col ="red", type = "l", lty = 4, lwd = 2)
    y2 <- red[n]
    y3 <- max(y)
    y4 <- rate * g(365)
@@ -46,7 +46,7 @@ drawBB2 <- function(dat, main = "", ylim, C = 365 / (log(366))^3,
    box()
    lines(c(0, g(28)), c(y0, y0), lty = 3, lwd = 0.5, col = "darkgreen")
    lines(c(0, g(28)), c(y1, y1), lty = 3, lwd = 0.5, col = "darkgreen")
-   lines(c(0, g(365)), c(y2, y2), lty = 3, lwd = 1.5, col = "darkgreen")
+   lines(c(0, g(28)), c(y2, y2), lty = 3, lwd = 1.5, col = "darkgreen")
    abline(h = c(y3, y4), lty = 3, lwd = 0.5, col = "darkgreen")
    abline(v = 0, lwd = 0.5)
    lines(c(0, g(28)), c(0, 0), lwd = 0.5)
@@ -83,5 +83,6 @@ drawBB2 <- function(dat, main = "", ylim, C = 365 / (log(366))^3,
    axis(2, at = round(c(0, y0, y1, y2), 3), las = 1)
    box()
    lines(c(0, x2), c(y0, y2), type = "l", lty = 2, col = "darkgreen")
-   }
+     }
+   invisible(rate)
 }

@@ -385,6 +385,48 @@ Remove?
 
 \includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/skum-1.pdf}
 
+## Biometric analysis on the natural time scale
+
+Given that the exogenous mortality follows an Exponential distribution on the log-cube scale, it follows that the cumulative hazards function on the natural time scale is
+
+\begin{equation*}
+H(t; \lambda) = \lambda \log^3(t + 1), \; t > 0,
+\end{equation*}
+
+and it follows that the hazard function $h$ is given by
+
+\begin{equation*}
+h(t; \lambda) = \frac{3 \log^2(t + 1)}{t + 1}, \; t > 0,
+\end{equation*}
+
+
+## Exogenous mortality on the normal time scale
+
+```{r normal, fig.height = 4}
+dg <- function(x) 3 * (log(1 + x))^2 / (1 + x) * 365 / (log(366))^3
+oldpar <- par(mfrow = c(1, 2))
+x <- 0:365
+y <- dg(x)
+plot(x, y, type = "l", xlab = "Day", ylab = "Hazards",
+     axes = FALSE, col = "blue", lwd = 2, main = "Hazard function")
+axis(1, at = c(0, 28, 183, 365))
+axis(2, las = 1, at = 0)
+box()
+abline(h = 0, v = 0)
+abline(v = 28, lty = 2, col = "darkgreen")
+y <- g(x)
+plot(x, y, type = "l", xlab = "Day", ylab  = "Cum. hazards", main = "Cumulative hazards",
+     col = "blue")
+par(oldpar)
+```
+
+
+## Natural vs. log-cube time scales
+
+Västerbotten 1861--1890.
+
+
+\includegraphics[width=\textwidth]{../paper2_files/figure-latex/natlogcube2-1.pdf}
 
 
 ## Conclusions
