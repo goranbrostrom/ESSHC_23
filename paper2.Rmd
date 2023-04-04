@@ -103,7 +103,7 @@ and due to imperfect time measuring there are often tied death ages. As an illus
 we use a data set from Västerbotten in northern Sweden, covering $221\,773$ births with $17\,675$ infant deaths over the years 1861--1950, see 
 Figure \@ref(fig:vbmap).
 
-```{r vbmap, fig.cap="Västerbotten."}
+```{r vbmap, fig.cap="Västerbotten.", out.width="6in"}
 knitr::include_graphics("Slides/myfigs/vb.png")
 ```
 
@@ -637,16 +637,19 @@ And so on.
 
 ## Biometric analysis on the natural time scale
 
-Given that the exogeneous mortality follows an Exponential distribution on the log-cube scale, it follows that the cumulative hazards function on the natural time scale is
+Given that the exogenous mortality follows an Exponential distribution on the log-cube scale, 
+it follows that the cumulative hazards function on the natural time scale is
 
 \begin{equation*}
-H(t; \lambda) = \lambda \log^3(t + 1), \; t > 0,
+H(t; \lambda) = \lambda \log^3(t + 1), \; t > 0.
 \end{equation*}
 
-and it follows that the hazard function $h$ is given by
+Note the duality: $\text{log-cube transform} \Longleftrightarrow  \text{cumulative hazards function}$!
+
+It follows that the hazard function $h$ is given by
 
 \begin{equation*}
-h(t; \lambda) = \frac{3 \log^2(t + 1)}{t + 1}, \; t > 0,
+h(t; \lambda) = \lambda \frac{3 \log^2(t + 1)}{t + 1}, \; t > 0,
 \end{equation*}
 
 see Figure \@ref(fig:normal).
@@ -811,7 +814,7 @@ However, the B-P method seems to have a slight upper hand regarding model fit.
 
 Skåne is the southernmost province of Sweden, see the map in Figure \@ref(fig:scaniamap).
 
-```{r scaniamap, fig.cap = "Skåne."}
+```{r scaniamap, fig.cap = "Skåne.", out.width="6in"}
 knitr::include_graphics("Slides/myfigs/scania.png")
 ```
 
@@ -825,7 +828,7 @@ is as expected and the neonatal mortality is high for all social groups. We are 
 think that the biometric model as it is described here simply is inappropriate during the eighteenth century.
 Specifically, the log-cube transformation, which fits well with 19th century data, seems
 to be completely out of order in the eighteenth century, maybe due to the high infant mortality,
-which in this dataset is 222 per thousand. 
+which in this data set is 222 per thousand. 
 
 ```{r scahigh, fig.cap = "Skåne 1710--1800."}
 sca1 <- readRDS("Rdata/sca1.rds")
@@ -840,25 +843,37 @@ drawBP(rs, main = "B-P method")
 par(oldpar)
 ```
 
-<!--- Let us look at the estimated cumulative hazards, total, 
-exogenous and endgenous, see Figure \@ref(fig:escu).
+Let us look at what happens on the natural time scale and with the Gompertz distribution 
+replacing the log-cube time transformation, see Figure \@ref(fig:escu).
 
-```{r escu, fig.cap = "Scania 1710-1800.", eval = FALSE}
+```{r escu, fig.cap = "Skåne 1710--1800, natural time scale, Gompertz exogenous distribution."}
 #source("R/biometric.R")
 #biometric(sca1, graph = TRUE)
-post <- age.window(sca1, c(g(28), 365))
-lambda <- with(post, sum(event) / sum(exit - enter))
-x <- c(0, rs$risktimes)
-y <- x * lambda
-hazo <- with(rs, c(0, n.events / size))
-hazo <- cumsum(hazo)
-plot(x, hazo, type = "s", col = "blue")
-lines(x, y)
-z <- hazo - y
-lines(x, z, col = "red")
+par(mfrow = c(1, 1), las = 1, lwd = 2, cex = 0.7)
+fit.c <- coxreg(Surv(enter, exit, event) ~ 1, data = sca11)
+hc <- hazards(fit.c)
+x <- c(0, hc[[1]][, 1])
+y <- c(0, cumsum(hc[[1]][, 2]))
+post <- age.window(sca11, c(28, 365))
+fit.g <- phreg(Surv(enter, exit, event) ~ 1, data = post, dist = "gompertz", param = "rate")
+hg <- hazards(fit.g)
+plot(x, y, type = "l", xlab = "Day", ylab = "Cumulative hazards", axes = FALSE)
+axis(1, at = c(0, 28, 183, 365))
+att <-  c(0, 0.041, 0.063, 0.104, 0.216, 0.278)
+axis(2, at = att)
+abline(h = att, lty = 3, lwd = 1)
+abline(h = 0, lwd = 1) 
+abline(v = 28, lty = 2, lwd = 1, col = "darkgreen")
+abline(v = 0, lwd = 1)
+box()
+y1 <- Hgompertz(x, shape = exp(-6.4115), rate = -0.007017,  param = "rate")
+lines(x, y1, col = "blue", lty = 2)
+xp <- x[c(0, 31:320)]
+yp <- y - y1
+lines(x, yp, col = "red", lty = 4)
 ```
 
---->
+Quite okay, if not perfect,
 
 ## Skellefteå 1821--1838
 
@@ -895,6 +910,10 @@ It works for data in approximately the same time period and similar environment,
 but beyond that, it is not generalizable at all. These methods should be used with 
 great care, if at all.
 -->
-Apparently, it works for many places in the mid-twentieth century, but beyond that, it is not generalizable. In fact, also when post-neonatal mortality is following a straight line on the log-cube scale, mortality may well deviate during different parts of the year. This means that the methods should be used with great care and only as a starting point.
+Apparently, it works for many places in the mid-twentieth century, but beyond that, 
+it is not generalisable. In fact, also when post-neonatal mortality is following a 
+straight line on the log-cube scale, mortality may well deviate during different 
+parts of the year. This means that the methods should be used with great care and 
+only as a starting point.
 
 # References
