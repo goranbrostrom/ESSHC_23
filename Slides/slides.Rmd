@@ -8,8 +8,13 @@ institute:
 - \inst{1}CEDAR, Umeå University (gb@ehar.se, https://github.com/goranbrostrom)
 output:
   beamer_presentation:
-    theme: Warsaw
+#      includes: 
+#         header: gb_header.txt
+#         before_body: gb_beforebody.txt
+      theme: Warsaw
 classoption: t
+header-includes:
+- \newcommand{\emp}[1]{\textcolor{blue}{#1}}
 ---
 
 ```{r setup, include=FALSE}
@@ -29,18 +34,18 @@ par(cex.axis = 1.2)
 ## Bourgeois-Pichat and causes of death
 
 *   Two categories: 
-    *   Endogenous: *inherited*, *delivery*, etc.
-    *   Exogenous: *accidental*, *infectious diseases*, etc.
+    *   \emp{Endogenous}: *inherited*, *delivery*, etc.
+    *   \emp{Exogenous}: *accidental*, *infectious diseases*, etc.
 *   How to differentiate between the two categories without infornation of causes of death?
 
-Bourgeois-Pichat's Biometric model.
+Bourgeois-Pichat's \emp{biometric model}.
 
 ## The biometric model
 
 Two postulates:
 
-1.  Endogenous deaths only occur during the neonatal period (0--28 days). 
-2.  On a specific time scale, exogenous infant mortality is uniformly distributed.
+1.  \emp{Endogenous} deaths only occur during the \emp{neonatal} period (0--28 days). 
+2.  On a specific time scale, \emp{exogenous} infant mortality is \emp{uniformly} distributed.
 
 ## The log-cube transform {.t}
 
@@ -57,7 +62,7 @@ C = \frac{365}{\log^3(365 + 1)}
 \end{equation*}
 
 \tiny
-\emph{Note:} $C$ is not part of B-P's original definition.
+\emph{Note:} $C$ is \emp{not} part of B-P's original definition.
 
 \end{column}
 
@@ -269,16 +274,16 @@ lines(c(g(28), g(309)), c(yn[6], yn[6]), lty = 4, lwd = 1)
 ## Earlier work 
 
 *   Knodel \& Kintner (1977).
-    *    Discusses effects of breastfeeding habits.
+    *    Discusses effects of \emp{breastfeeding} habits.
 *   Wrigley (1977).
-    *    Problems with data recording.
+    *    Problems with \emp{data recording}.
 *   Lynch, Greenhouse \& Brändström (1998).
-    *    Mentions "constant hazard".
-    *    Suggest linear regression methods.
+    *    Mentions \emp{"constant hazard"}.
+    *    Suggest \emp{linear regression} methods.
 *   Bengtsson (1999).
-    *    Data quality.
+    *    Data \emp{quality}.
 *   Manfredini (2004).
-    *    Deals with effect of climate variation.
+    *    Deals with effect of \emp{climate} variation.
 
 
 ## Study areas
@@ -387,24 +392,26 @@ Remove?
 
 ## Biometric analysis on the natural time scale
 
-Given that the exogenous mortality follows an Exponential distribution on the log-cube scale, it follows that the cumulative hazards function on the natural time scale is
+Given that the exogenous mortality follows an Exponential distribution on the log-cube scale, 
+it follows that the \emp{cumulative hazards} function \emp{$H$} on the \emp{natural} time scale is
 
 \begin{equation*}
-H(t; \lambda) = \lambda \log^3(t + 1), \; t > 0,
+H(t; \lambda) = \lambda \log^3(t + 1), \; t \ge 0,
 \end{equation*}
 
-and it follows that the hazard function $h$ is given by
+and it follows that the \emp{hazard} function \emp{$h$} is given by
 
 \begin{equation*}
-h(t; \lambda) = \frac{3 \log^2(t + 1)}{t + 1}, \; t > 0,
+h(t; \lambda) = \lambda \frac{3 \log^2(t + 1)}{t + 1}, \; t \ge 0,
 \end{equation*}
 
+As $\lambda$ varies, this constitutes a \emp{proportional hazards} family of distributions.
 
 ## Exogenous mortality on the normal time scale
 
 ```{r normal, fig.height = 4}
 dg <- function(x) 3 * (log(1 + x))^2 / (1 + x) * 365 / (log(366))^3
-oldpar <- par(mfrow = c(1, 2))
+oldpar <- par(mfrow = c(1, 2), las = 1)
 x <- 0:365
 y <- dg(x)
 plot(x, y, type = "l", xlab = "Day", ylab = "Hazards",
@@ -416,26 +423,42 @@ abline(h = 0, v = 0)
 abline(v = 28, lty = 2, col = "darkgreen")
 y <- g(x)
 plot(x, y, type = "l", xlab = "Day", ylab  = "Cum. hazards", main = "Cumulative hazards",
-     col = "blue")
+     col = "blue", axes = FALSE)
+axis(1, at = c(0, 28, 183, 365))
+axis(2, las = 1, at = 0)
+abline(h = 0, v = 0)
+box()
 par(oldpar)
 ```
 
 
 ## Natural vs. log-cube time scales
 
-Västerbotten 1861--1890.
+\emp{Västerbotten} 1861--1890.
 
 
 \includegraphics[width=\textwidth]{../paper2_files/figure-latex/natlogcube2-1.pdf}
 
+## Natural time scale and Gompertz exogenous distribution
+
+\emp{Skåne} 1711--1800
+
+\includegraphics[width = \textwidth]{../paper2_files/figure-latex/escu-1.pdf}
 
 ## Conclusions
 
-*   Advantages of the hazards method.
-       *    Fits naturally into modern survival analysis, allows censored and truncated data, and 
-       *   The exogenous component forms a class of proportional hazards distributions.
+*   \emp{Advantages} of the hazards method.
+       *    Fits naturally into modern survival analysis, allows \emp{censored} and \emp{truncated data}, and 
+       *    The \emp{exogenous} component forms a class of \emp{proportional hazards} distributions.
     
-*   Restriction for both models.
-    *   Models for populations, not for individuals.
-    *   Less useful for traditional survival analysis.
-    *.  The log-cube transform is not universal.
+*   \emp{Restrictions} for both models.
+    *   Models for \emp{populations}, not for individuals.
+    *   \emp{Less useful} for traditional \emp{survival analysis}.
+    *   The \emp{log-cube} transform is \emp{not} universal.
+    
+*   \emp{Suggestions}.
+    *   Work on the \emp{natural} time scale, if access to a computer.
+    *   Try \emp{standard} distributions for \emp{exogenous}  mortality. 
+    *   \emp{Remember} that we are dealing with \emp{competing risks}!
+        *   Requires special care.
+    
