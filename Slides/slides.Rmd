@@ -26,8 +26,8 @@ par(cex.axis = 1.2)
 
 ## Outline
 
-*   Bourgeois-Pichat (1951): Biometric analysis of IM (background).
-*   Hazard-based alternative.
+*   Jean \emp{Bourgeois-Pichat} (1951): \emp{Biometric} analysis of infant mortality (background).
+*   \emp{Hazard}-based \emp{alternative}.
 *   Theoretical considerations
 *   Real-world examples.
 
@@ -36,7 +36,7 @@ par(cex.axis = 1.2)
 *   Two categories: 
     *   \emp{Endogenous}: *inherited*, *delivery*, etc.
     *   \emp{Exogenous}: *accidental*, *infectious diseases*, etc.
-*   How to differentiate between the two categories without infornation of causes of death?
+*   How to \emp{differentiate} between the two categories \emp{without information} of causes of death?
 
 Bourgeois-Pichat's \emp{biometric model}.
 
@@ -46,6 +46,7 @@ Two postulates:
 
 1.  \emp{Endogenous} deaths only occur during the \emp{neonatal} period (0--28 days). 
 2.  On a specific time scale, \emp{exogenous} infant mortality is \emp{uniformly} distributed.
+    *   The \emp{log-cube} time scale.
 
 ## The log-cube transform {.t}
 
@@ -61,8 +62,15 @@ where $C$ is a normalizing constant:
 C = \frac{365}{\log^3(365 + 1)}
 \end{equation*}
 
-\tiny
+$t$ is age in days.
+
+\vspace{\baselineskip}
+
+\tiny{
 \emph{Note:} $C$ is \emp{not} part of B-P's original definition.
+}
+
+
 
 \end{column}
 
@@ -74,7 +82,7 @@ C = \frac{365}{\log^3(365 + 1)}
 
 ## Demonstration of the B-P plot
 
-Assume 100 births, of which 90 survives infancy, ten death ages: 
+Assume \emp{100 births}, of which \emp{90 survives} infancy, \emp{ten death ages}: 
 
 2, 6, 10, 15, 25, 41, 90, 120, 180, 309.
 
@@ -107,7 +115,7 @@ p_n = \frac{n}{100}, \; n = 1, \ldots 10
 
 ## Demonstration of the B-P plot II
 
-Assume 100 births, of which 90 survives infancy, ten death ages: 
+Assume \emp{100 births}, of which \emp{90 survives} infancy, \emp{ten death ages}: 
 
 2, 6, 10, 15, 25, 41, 90, 120, 180, 309.
 
@@ -157,7 +165,7 @@ p_n = \frac{n}{100}, \; n = 1, \ldots 10
 
 ## The hazards plot
 
-Assume 100 births, of which 90 survives infancy, ten death ages: 
+Assume \emp{100 births}, of which \emp{90 survives} infancy, \emp{ten death ages}: 
 
 2, 6, 10, 15, 25, 41, 90, 120, 180, 309 (same as before).
 
@@ -230,6 +238,8 @@ Exogenous slope = $\frac{\#\text{(post deaths)}}{\text{post exposure}} = \frac{5
 Post exposure = $90 (365 - 68) + (93 - 68) + (163 - 68) + \cdots + (335 - 68) \approx 27626$
 
 ## Adding the endogenous mortality
+
+By \emp{subtraction}: $\text{Endogenous} = \text{Total} - \text{Exogenous}$
 
 ```{r hazex3, fig.height = 5}
 par(mai = c(1,1,1,1), lwd = 2)
@@ -305,13 +315,13 @@ Västerbotten 1801--1950
 \end{column}
 \end{columns}
 
-## Väterbotten 1861-1890
+## Västerbotten 1861-1890
 
 \includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/bioume6190-1.pdf}
 
 ## Västerbotten 1921--1950
 
-\includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/bioume9120-1.pdf}
+\includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/lowumee-1.pdf}
 
 ## Cohort effect of birth month, Västerbotten 
 
@@ -327,7 +337,8 @@ Västerbotten 1801--1950
 Conclusion:
 \vspace{2\baselineskip}
 
-Post-neonatal linearity is a population property, not an individual.
+Post-neonatal \emp{linearity} is a \emp{population property}, not an individual.
+
 \end{column}
 
 \end{columns}
@@ -450,15 +461,25 @@ par(oldpar)
 *   \emp{Advantages} of the hazards method.
        *    Fits naturally into modern survival analysis, allows \emp{censored} and \emp{truncated data}, and 
        *    The \emp{exogenous} component forms a class of \emp{proportional hazards} distributions.
+       *    So, theoretically more appropriate.
     
 *   \emp{Restrictions} for both models.
     *   Models for \emp{populations}, not for individuals.
     *   \emp{Less useful} for traditional \emp{survival analysis}.
     *   The \emp{log-cube} transform is \emp{not} universal.
+
+## Suggestions for future work
+
+
+*   Work on the \emp{natural} time scale, if 
+    *   access to a computer, and
+    *   suitable software.
+*   Try \emp{standard} distributions for \emp{exogenous}  mortality, eg.
+    *   \emp{Weibull},
+    *   \emp{Gompertz}.
+*   \emp{Remember} that we are dealing with \emp{competing risks}!
+    *   Requires special care.
     
-*   \emp{Suggestions}.
-    *   Work on the \emp{natural} time scale, if access to a computer.
-    *   Try \emp{standard} distributions for \emp{exogenous}  mortality. 
-    *   \emp{Remember} that we are dealing with \emp{competing risks}!
-        *   Requires special care.
-    
+[https://github.com/goranbrostrom/ESSHC_23](https://github.com/goranbrostrom/ESSHC_23)
+
+**R** code for this paper and talk.
