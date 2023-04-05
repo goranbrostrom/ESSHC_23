@@ -62,7 +62,7 @@ where $C$ is a normalizing constant:
 C = \frac{365}{\log^3(365 + 1)}
 \end{equation*}
 
-$t$ is age in days.
+$t$ is \emp{age in days}.
 
 \vspace{\baselineskip}
 
@@ -105,7 +105,7 @@ text(110, 0.11, "Post-neonatal", col = "blue")
 points(g(c(41, 309)), c(6/100, 10/100), col = "red", lwd = 2, pch = 4)
 ```
 
-Calculation (no ties): $\frac{1}{100}, \frac{2}{100}, \frac{3}{100}, \ldots, \frac{10}{100}.$ 
+Calculation (no ties): $(2, \frac{1}{100}), (6, \frac{2}{100}), (10, \frac{3}{100}), \ldots, (309, \frac{10}{100}).$ 
 
 <!--
 \begin{equation*}
@@ -233,7 +233,6 @@ text(110, 0.12, "Post-neonatal", col = "blue", cex = 0.8)
 
 Exogenous slope = $\frac{\#\text{(post deaths)}}{\text{post exposure}} = \frac{5}{27626} \approx 0.00018$
 
-\tiny
 
 Post exposure = $90 (365 - 68) + (93 - 68) + (163 - 68) + \cdots + (335 - 68) \approx 27626$
 
@@ -319,9 +318,17 @@ Västerbotten 1801--1950
 
 \includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/bioume6190-1.pdf}
 
+Total mortality: $1 - \exp(-0.106) \approx 0.101$.
+
+Excellent fits!
+
 ## Västerbotten 1921--1950
 
 \includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/lowumee-1.pdf}
+
+Total mortality: $1 - \exp(-0.056) \approx 0.054$.
+
+Excellent fits!
 
 ## Cohort effect of birth month, Västerbotten 
 
@@ -396,10 +403,17 @@ Remove?
 
 \includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/scahigh-1.pdf}
 
+The log-cube model \emp{does not fit} at all, despite \emp{high-quality} data!
+
+\emp{Too old} time period?
 
 ## Skellefteå 1801--1820
 
 \includegraphics[width=0.8\textwidth]{../paper2_files/figure-latex/skum-1.pdf}
+
+*   Reasonable linear post-neonatal fit.
+*   But \emp{no} room for \emp{endogenous} mortality.
+*   Many \emp{early deaths missing}. 
 
 ## Biometric analysis on the natural time scale
 
@@ -418,7 +432,9 @@ h(t; \lambda) = \lambda \frac{3 \log^2(t + 1)}{t + 1}, \; t \ge 0,
 
 As $\lambda$ varies, this constitutes a \emp{proportional hazards} family of distributions.
 
-## Exogenous mortality on the normal time scale
+\emp{NOTE:} $H(t; \lambda)$ is the \emp{log-cube transform!}
+
+## Exogenous mortality on the natural time scale
 
 ```{r normal, fig.height = 4}
 dg <- function(x) 3 * (log(1 + x))^2 / (1 + x) * 365 / (log(366))^3
@@ -452,9 +468,11 @@ par(oldpar)
 
 ## Natural time scale and Gompertz exogenous distribution
 
-\emp{Skåne} 1711--1800
+\emp{Skåne} 1711--1800.
 
 \includegraphics[width = \textwidth]{../paper2_files/figure-latex/escu-1.pdf}
+
+\emp{Decent fit} if we skip the log-cube distribution!
 
 ## Conclusions
 
@@ -480,6 +498,7 @@ par(oldpar)
 *   \emp{Remember} that we are dealing with \emp{competing risks}!
     *   Requires special care.
     
-[https://github.com/goranbrostrom/ESSHC_23](https://github.com/goranbrostrom/ESSHC_23)
 
-**R** code for this paper and talk.
+**R** code for this paper:
+
+[https://github.com/goranbrostrom/ESSHC_23](https://github.com/goranbrostrom/ESSHC_23)
